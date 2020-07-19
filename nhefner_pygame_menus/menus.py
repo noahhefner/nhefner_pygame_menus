@@ -1,7 +1,7 @@
 """
 Noah Hefner
 Pygame Menu System
-Last Edit: 6 July 2020
+Last Edit: 18 July 2020
 """
 
 # Imports
@@ -20,6 +20,37 @@ menu_manager_settings = {
 
 }
 
+class Action:
+    """
+    Holds function and argument data for buttons.
+
+    Attributes:
+        function: The function to execute.
+        arguments: Arguments for the function.
+        keyword_arguments: Keyword arguments for the function.
+    """
+
+    def __init__ (self, function, *args, **kwargs):
+        """
+        Instantiate an Action object.
+
+        Arguments:
+            function: The function to execute.
+            *args: Arguments for the function.
+            **kwargs: Keyword arguments for the function.
+        """
+
+        self.function = function
+        self.arguments = args
+        self.keyword_arguments = kwargs
+
+    def execute (self):
+        """
+        Calls the function, passing it the args and kwargs.
+        """
+
+        self.function(*self.arguments, **self.keyword_arguments)
+
 class ButtonPicture(pygame.sprite.Sprite):
     """
     Button object for menu manager.
@@ -31,7 +62,7 @@ class ButtonPicture(pygame.sprite.Sprite):
         action_args (*args): Any arguments required by the action.
     """
 
-    def __init__ (self, image, action, *action_args, pos = [0,0]):
+    def __init__ (self, image, pos = [0,0]):
         """
         Instantiate a button object.
 
@@ -45,12 +76,24 @@ class ButtonPicture(pygame.sprite.Sprite):
         super(ButtonPicture, self).__init__()
 
         self.image = pygame.image.load(image)
-        self.action = action
         self.image.set_colorkey(menu_manager_settings["element_colorkey"])
         self.rect = self.image.get_rect()
         self.rect.x = pos[0]
         self.rect.y = pos[1]
-        self.action_args = action_args
+        self.actions = []
+
+    def add_action (self, function, *args, **kwargs):
+        """
+        Adds an action to the list of actions for this button.
+
+        Arguments:
+            function: The function to execute.
+            *args: Arguments for the function.
+            **kwargs: Keyword arguments for the function.
+        """
+
+        new_action = Action(function, args, kwargs)
+        self.actions.append(new_action)
 
     def is_clicked (self, mouse_pos):
         """
@@ -80,14 +123,14 @@ class ButtonPicture(pygame.sprite.Sprite):
         self.rect.x = pos[0]
         self.rect.y = pos[1]
 
-    def execute_action (self):
+    def execute_actions (self):
         """
         Execute function linked to this button.
         """
 
-        if (self.action != None):
+        for action in self.actions:
 
-            self.action(*self.action_args)
+            action.execute()
 
 class ButtonText (pygame.sprite.Sprite):
     """
@@ -100,9 +143,8 @@ class ButtonText (pygame.sprite.Sprite):
         action_args (*args): Any arguments required by the action.
     """
 
-    def __init__ (self, text, font, action, *action_args, pos = [0,0], \
-                  color = [255, 255, 255], antialias = True, \
-                  background_color = None):
+    def __init__ (self, text, font, pos = [0,0], color = [255, 255, 255], \
+                  antialias = True, background_color = None):
         """
         Instantiate a button object.
 
@@ -123,12 +165,34 @@ class ButtonText (pygame.sprite.Sprite):
         self.background_color = background_color
 
         self.image = font.render(str(text), antialias, color, background_color)
-        self.action = action
         self.image.set_colorkey(menu_manager_settings["element_colorkey"])
         self.rect = self.image.get_rect()
         self.rect.x = pos[0]
         self.rect.y = pos[1]
-        self.action_args = action_args
+
+        self.actions = []
+
+    def add_action (self, function, *args, **kwargs):
+        """
+        Adds an action to the list of actions for this button.
+
+        Arguments:
+            function: The function to execute.
+            *args: Arguments for the function.
+            **kwargs: Keyword arguments for the function.
+        """
+
+        new_action = Action(function, args, kwargs)
+        self.actions.append(new_action)
+
+    def execute_actions (self):
+        """
+        Execute function linked to this button.
+        """
+
+        for action in self.actions:
+
+            action.execute()
 
     def get_text(self):
         """
@@ -393,7 +457,7 @@ class MenuManager:
 
                         if element.is_clicked(mouse_pos):
 
-                            element.execute_action()
+                            element.execute_actions()
 
         return True
 
@@ -406,7 +470,7 @@ class MenuManager:
 
     def kill_program (self):
         """
-        Stops program execution.
+        Terminates the entire program.
         """
 
         exit()

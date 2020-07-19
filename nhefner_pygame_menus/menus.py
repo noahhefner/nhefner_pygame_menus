@@ -92,7 +92,24 @@ class ButtonPicture(pygame.sprite.Sprite):
             **kwargs: Keyword arguments for the function.
         """
 
-        new_action = Action(function, args, kwargs)
+        new_action = None
+
+        if len(args) > 0 and len(kwargs) > 0:
+
+            new_action = Action(function, args = args, kwargs = kwargs)
+
+        elif len(args) > 0 and len(kwargs) == 0:
+
+            new_action = Action(function, args = args)
+
+        elif len(args) == 0 and len(kwargs) > 0:
+
+            new_action = Action(function, kwargs = kwargs)
+
+        else:
+
+            new_action = Action(function)
+
         self.actions.append(new_action)
 
     def is_clicked (self, mouse_pos):

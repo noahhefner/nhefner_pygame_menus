@@ -9,7 +9,7 @@ setup(
   author = 'Noah Hefner',
   author_email = 'noah.hefner127@gmail.com',
   url = 'https://github.com/noahhefner/nhefner_pygame_menus',
-  download_url = 'https://github.com/noahhefner/nhefner_pygame_menus/archive/0.11.tar.gz',
+  download_url = 'https://github.com/noahhefner/nhefner_pygame_menus/archive/0.12.tar.gz',
   keywords = ['pygame', 'menu', 'python'],
   install_requires=[
           'pygame'

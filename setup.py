@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
   name = 'nhefner_pygame_menus',
   packages = ['nhefner_pygame_menus'],
-  version = '0.11',
+  version = '0.12',
   license='MIT',
   description = 'Menu System for Pygame Games',
   author = 'Noah Hefner',

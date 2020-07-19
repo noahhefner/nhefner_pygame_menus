@@ -3,13 +3,13 @@ from distutils.core import setup
 setup(
   name = 'nhefner_pygame_menus',
   packages = ['nhefner_pygame_menus'],
-  version = '0.12',
+  version = '0.13',
   license='MIT',
   description = 'Menu System for Pygame Games',
   author = 'Noah Hefner',
   author_email = 'noah.hefner127@gmail.com',
   url = 'https://github.com/noahhefner/nhefner_pygame_menus',
-  download_url = 'https://github.com/noahhefner/nhefner_pygame_menus/archive/0.12.tar.gz',
+  download_url = 'https://github.com/noahhefner/nhefner_pygame_menus/archive/0.13.tar.gz',
   keywords = ['pygame', 'menu', 'python'],
   install_requires=[
           'pygame'

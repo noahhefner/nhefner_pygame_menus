@@ -82,6 +82,28 @@ class ButtonPicture(pygame.sprite.Sprite):
         self.rect.y = pos[1]
         self.actions = []
 
+    def get_pos (self):
+        """
+        Get the position of this picture button element.
+
+        Returns:
+            pos (list): XY position of the picture button.
+        """
+
+        position = [self.rect.x, self.rect.y]
+        return position
+
+    def set_pos (self, pos):
+        """
+        Set position of the button.
+
+        Arguments:
+            pos (tuple): XY position to set the button to.
+        """
+
+        self.rect.x = pos[0]
+        self.rect.y = pos[1]
+
     def add_action (self, function, *args, **kwargs):
         """
         Adds an action to the list of actions for this button.
@@ -94,6 +116,15 @@ class ButtonPicture(pygame.sprite.Sprite):
 
         new_action = Action(function, args, kwargs)
         self.actions.append(new_action)
+
+    def execute_actions (self):
+        """
+        Execute function linked to this button.
+        """
+
+        for action in self.actions:
+
+            action.execute()
 
     def is_clicked (self, mouse_pos):
         """
@@ -111,26 +142,6 @@ class ButtonPicture(pygame.sprite.Sprite):
 
         # True if within x and y area
         return within_x and within_y
-
-    def set_pos (self, pos):
-        """
-        Set position of the button.
-
-        Arguments:
-            pos (tuple): XY position to set the button to.
-        """
-
-        self.rect.x = pos[0]
-        self.rect.y = pos[1]
-
-    def execute_actions (self):
-        """
-        Execute function linked to this button.
-        """
-
-        for action in self.actions:
-
-            action.execute()
 
 class ButtonText (pygame.sprite.Sprite):
     """
@@ -172,6 +183,49 @@ class ButtonText (pygame.sprite.Sprite):
 
         self.actions = []
 
+    def get_pos (self):
+        """
+        Get the position of this text button element.
+
+        Returns:
+            pos (list): XY position of the text button.
+        """
+
+        position = [self.rect.x, self.rect.y]
+        return position
+
+    def get_text(self):
+        """
+        Get the text of the button.
+
+        Returns:
+            self.text (String): Text of the button.
+        """
+
+        return self.text
+
+    def set_pos (self, pos):
+        """
+        Set position of the text.
+
+        Arguments:
+            pos (list): XY position to set the text button to.
+        """
+
+        self.rect.x = pos[0]
+        self.rect.y = pos[1]
+
+    def set_text (self, new_text):
+        """
+        Changes the text of the button.
+
+        Arguments:
+            new_text (String): New text of the button.
+        """
+
+        self.text = new_text
+        self.image = self.font.render(str(new_text), self.antialias, self.color, self.background_color)
+
     def add_action (self, function, *args, **kwargs):
         """
         Adds an action to the list of actions for this button.
@@ -194,27 +248,6 @@ class ButtonText (pygame.sprite.Sprite):
 
             action.execute()
 
-    def get_text(self):
-        """
-        Get the text of the button.
-
-        Returns:
-            self.text (String): Text of the button.
-        """
-
-        return self.text
-
-    def change_text (self, new_text):
-        """
-        Changes the text of the button.
-
-        Arguments:
-            new_text (String): New text of the button.
-        """
-
-        self.text = new_text
-        self.image = self.font.render(str(new_text), self.antialias, self.color, self.background_color)
-
     def is_clicked (self, mouse_pos):
         """
         Returns true if the mouse cursor position is on this sprite.
@@ -231,26 +264,6 @@ class ButtonText (pygame.sprite.Sprite):
 
         # True if within x and y area
         return within_x and within_y
-
-    def set_pos (self, pos):
-        """
-        Set position of the button.
-
-        Arguments:
-            pos (tuple): XY position to set the button to.
-        """
-
-        self.rect.x = pos[0]
-        self.rect.y = pos[1]
-
-    def execute_action (self):
-        """
-        Execute function linked to this button.
-        """
-
-        if (self.action != None):
-
-            self.action(*self.action_args)
 
 class Picture (pygame.sprite.Sprite):
     """
@@ -277,6 +290,17 @@ class Picture (pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = pos[0]
         self.rect.y = pos[1]
+
+    def get_pos (self):
+        """
+        Get the position of this picture element.
+
+        Returns:
+            pos (list): XY position of the picture.
+        """
+
+        position = [self.rect.x, self.rect.y]
+        return position
 
     def set_pos (self, pos):
         """
@@ -333,12 +357,23 @@ class Text (pygame.sprite.Sprite):
         self.rect.x = pos[0]
         self.rect.y = pos[1]
 
+    def get_pos (self):
+        """
+        Get the position of this text element.
+
+        Returns:
+            pos (list): XY position of the text.
+        """
+
+        position = [self.rect.x, self.rect.y]
+        return position
+
     def set_pos (self, pos):
         """
         Set position of the text.
 
         Arguments:
-            pos (tuple): XY position to set the text to.
+            pos (list): XY position to set the text to.
         """
 
         self.rect.x = pos[0]
@@ -368,6 +403,15 @@ class MenuManager:
         self.start_page = None
         self.exiting = False
 
+    def run (self):
+        """
+        Puts the menu loop into a function for ease of use.
+        """
+
+        while self.__update():
+
+            self.__display()
+
     def add_page (self, new_page):
         """
         Adds a page to the menu manager.
@@ -378,14 +422,28 @@ class MenuManager:
 
         self.pages.append(new_page)
 
-    def do_menu_stuff (self):
+    def set_start_page (self, page_id):
         """
-        Puts the menu loop into a function for ease of use.
+        Set a start page for the menu manager. This function must be called
+        before calling ManuManager.run() or the program will be terminated.
+
+        Arguments:
+            page_id (String/Int): ID of the desired page destination.
+
+        NOTE: See Page class for more info on page id's.
+
         """
 
-        while self.update():
+        for page in self.pages:
 
-            self.display()
+            if (page_id == page.id):
+
+                self.current_page = page
+                self.start_page = page
+                return
+
+        print("Invalid start page id!")
+        exit()
 
     def navigate (self, page_id):
         """
@@ -405,20 +463,34 @@ class MenuManager:
 
                 return
 
-    def set_start_page (self, start_page):
+    def exit_menu (self):
         """
-        Set a start page for the menu manager. This function requires that the
-        start page already be in the menu manager.
+        For exiting the menu manager. Flips the exiting flag.
         """
 
-        for page in self.pages:
+        self.exiting = True
 
-            if (page.id == start_page.id):
+    def kill_program (self):
+        """
+        Terminates the entire program.
+        """
 
-                self.current_page = start_page
-                self.start_page = page
+        exit()
 
-    def update (self):
+    def __display (self):
+        """
+        Blit everything from backend to the screen.
+        """
+
+        # Fill background
+        self.screen.fill(menu_manager_settings["menu_background_color"])
+
+        # Display current screen
+        self.current_page.display(self.screen)
+        pygame.display.flip()
+        self.clock.tick(menu_manager_settings["menu_fps"])
+
+    def __update (self):
         """
         Handles user events. Also checks if a start page has been set. This
         function will prevent the program from running if a sart page has not
@@ -460,33 +532,6 @@ class MenuManager:
                             element.execute_actions()
 
         return True
-
-    def exit_menu (self):
-        """
-        For exiting the menu manager. Flips the exiting flag.
-        """
-
-        self.exiting = True
-
-    def kill_program (self):
-        """
-        Terminates the entire program.
-        """
-
-        exit()
-
-    def display (self):
-        """
-        Blit everything from backend to the screen.
-        """
-
-        # Fill background
-        self.screen.fill(menu_manager_settings["menu_background_color"])
-
-        # Display current screen
-        self.current_page.display(self.screen)
-        pygame.display.flip()
-        self.clock.tick(menu_manager_settings["menu_fps"])
 
 class Page:
     """

@@ -1,7 +1,7 @@
 # **nhefner_pygame_menus**
 These python modules provide an easy way to implement a menu system for games written with the python library pygame.
 
-![Screenshot One](/nhefner_pygame_menus/screenshots/home.PNG)
+![Screenshot One](nhefner_pygame_menus/screenshots/home.PNG)
 
 ### About These Modules
 This menu system is built using pygames existing modules. GUI elements are represented using pygame's Sprite module.

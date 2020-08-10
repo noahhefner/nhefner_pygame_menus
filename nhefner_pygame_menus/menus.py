@@ -125,7 +125,7 @@ class ButtonPicture(pygame.sprite.Sprite):
 
     def execute_actions (self):
         """
-        Execute function linked to this button.
+        Execute actions on this button.
         """
 
         for action in self.actions:

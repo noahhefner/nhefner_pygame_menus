@@ -1,7 +1,7 @@
 """
 Noah Hefner
 Pygame Menu System
-Last Edit: 10 August 2020
+Last Edit: 11 August 2020
 """
 
 # Imports
@@ -11,7 +11,7 @@ import string
 # Initialize pygame
 pygame.init()
 
-# Settings
+# Settings for menu system
 menu_manager_settings = {
 
     "element_colorkey" : [0, 0, 0],
@@ -36,8 +36,8 @@ class Action:
 
         Arguments:
             function: The function to execute.
-            *args: Arguments for the function.
-            **kwargs: Keyword arguments for the function.
+            args: Arguments for the function.
+            kwargs: Keyword arguments for the function.
         """
 
         self.function = function
@@ -57,9 +57,9 @@ class ButtonPicture(pygame.sprite.Sprite):
 
     Attributes:
         image (pygame.image): Image for button.
-        action (function): Function to execute when button is pressed.
         rect (pygame.image.rect): Position, height, width values for image.
-        action_args (*args): Any arguments required by the action.
+        actions (list): List of action objects. These actions are executed when
+                        the button is pressed.
     """
 
     def __init__ (self, image, pos = [0,0]):
@@ -68,9 +68,7 @@ class ButtonPicture(pygame.sprite.Sprite):
 
         Arguments:
             image (string): Path of image file to be used for button.
-            action (function): Function to execute when button is pressed.
-            action_args (*args): Any arguments required by the action.
-            pos (tuple): XY position for the button.
+            pos (list): XY position for the button.
         """
 
         super(ButtonPicture, self).__init__()
@@ -80,7 +78,7 @@ class ButtonPicture(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = pos[0]
         self.rect.y = pos[1]
-        self.actions = []
+        self.actions = list()
 
     def get_pos (self):
         """
@@ -98,7 +96,7 @@ class ButtonPicture(pygame.sprite.Sprite):
         Set position of the button.
 
         Arguments:
-            pos (tuple): XY position to set the button to.
+            pos (list): XY position to set the button to. Should be 2 integers.
         """
 
         self.rect.x = pos[0]
@@ -128,10 +126,11 @@ class ButtonPicture(pygame.sprite.Sprite):
 
     def is_clicked (self, mouse_pos):
         """
-        Returns true if the mouse cursor position is on this sprite.
+        Returns true if the mouse cursor position is on this sprite. False
+        otherwise.
 
         Arguments:
-            mouse_pos (tuple): XY position of the cursor.
+            mouse_pos (list): XY position of the cursor. Should be 2 integers.
         """
 
         # Check x axis
@@ -148,44 +147,78 @@ class ButtonText (pygame.sprite.Sprite):
     Text Button object for menu manager.
 
     Attributes:
+        font (pygame.font.SysFont): Font to render the text button in.
+        text (string): Text to make the button from.
+        antialias (boolean): Sets on/off antialias for the rendering of the
+                             text button.
+        background_color (list): RGB values for the background color of the
+                                 text button.
+        color (list): RGB values for the color of this text button.
         image (pygame.image): Pygame image for the text button.
-        action (function): Function to execute when button is pressed.
         rect (pygame.image.rect): Position, height, width values for image.
-        action_args (*args): Any arguments required by the action.
+        actions (list): List of action objects. These actions are executed when
+                        the text button is pressed.
     """
 
-    def __init__ (self, text, font, pos = [0,0], color = [255, 255, 255], \
-                  antialias = True, background_color = None):
+    def __init__ (self, font, text, antialias = True, \
+                  background_color = [0, 0, 0], color = [255, 255, 255], \
+                  pos = [0,0]):
         """
-        Instantiate a button object.
+        ButtonText constructor.
 
         Arguments:
+            font (pygame.font.SysFont): Font to render the text button in.
             text (string): Text to make the button from.
-            font (pygame.font.SysFont): Font to render the text in.
-            action (function): Function to execute when button is pressed.
-            action_args (*args): Any arguments required by the action.
-            pos (tuple): XY position for the button.
+            antialias (boolean): Sets on/off antialias for the rendering of the
+                                 text.
+            background_color (list): RGB values for the background color of the
+                                     text button.
+            color (list): RGB values for the color of this text button.
+            pos (list): XY position for the text button.
         """
 
         super(ButtonText, self).__init__()
 
-        self.text = text
         self.font = font
-        self.antialias = antialias
-        self.color = color
-        self.background_color = background_color
+        self.text = text
 
-        self.image = font.render(str(text), antialias, color, background_color)
-        self.image.set_colorkey(menu_manager_settings["element_colorkey"])
+        self.antialias = antialias
+        self.background_color = background_color
+        self.color = color
+
+        self.image = self.__render()
+        self.image.set_colorkey([0, 0, 0])
         self.rect = self.image.get_rect()
         self.rect.x = pos[0]
         self.rect.y = pos[1]
 
-        self.actions = []
+        self.actions = list()
+
+    def get_antialias (self):
+        """
+        Get antialias boolean.
+
+        Returns:
+            antialias (boolean): True if antialias is set to True, False
+                                 otherwise.
+        """
+
+        return self.antialias
+
+    def get_background_color (self):
+        """
+        Get the background color of the text button.
+
+        Returns:
+            background_color (list): RGB values for the background color of the
+                                     text button. Should be 3 integers.
+        """
+
+        return self.background_color
 
     def get_pos (self):
         """
-        Get the position of this text button element.
+        Get the position of this text button.
 
         Returns:
             pos (list): XY position of the text button.
@@ -194,37 +227,63 @@ class ButtonText (pygame.sprite.Sprite):
         position = [self.rect.x, self.rect.y]
         return position
 
-    def get_text(self):
+    def get_color (self):
         """
-        Get the text of the button.
+        Get the color of this text button.
 
         Returns:
-            self.text (String): Text of the button.
+            color (list): RGB values for the color of this text button.
         """
 
-        return self.text
+        return self.color
+
+    def set_antialias (self, new_antialias):
+        """
+        Set the antialias boolean for the text button.
+
+        Arguments:
+            new_antialias (boolean): Antialias boolean. True for on, False for
+                                     off.
+        """
+
+        self.antialias = new_antialias
+        self.__render()
+
+    def set_background_color (self, new_background_color):
+        """
+        Set the background color of the text.
+
+        Arguments:
+            new_background_color (list): RGB values for the background color of
+                                         the text button. Should be 3 integers.
+        """
+
+        self.background_color = new_background_color
+        self.__render()
 
     def set_pos (self, pos):
         """
         Set position of the text.
 
         Arguments:
-            pos (list): XY position to set the text button to.
+            pos (list): XY position to set the text button to. Should be 2
+                        integers.
         """
 
         self.rect.x = pos[0]
         self.rect.y = pos[1]
 
-    def set_text (self, new_text):
+    def set_color (self, new_color):
         """
-        Changes the text of the button.
+        Set the color of the text button.
 
         Arguments:
-            new_text (String): New text of the button.
+            new_color (list): RGB values for the new color of this text button.
+                              Should be 3 integers.
         """
 
-        self.text = new_text
-        self.image = self.font.render(str(new_text), self.antialias, self.color, self.background_color)
+        self.color = new_color
+        self.__render()
 
     def add_action (self, function, *args, **kwargs):
         """
@@ -253,7 +312,7 @@ class ButtonText (pygame.sprite.Sprite):
         Returns true if the mouse cursor position is on this sprite.
 
         Arguments:
-            mouse_pos (tuple): XY position of the cursor.
+            mouse_pos (list): XY position of the cursor.
         """
 
         # Check x area
@@ -264,6 +323,20 @@ class ButtonText (pygame.sprite.Sprite):
 
         # True if within x and y area
         return within_x and within_y
+
+    def __render (self):
+        """
+        Render the image of the button using the attributes of this instance.
+        Also updates rect in case text change alters rect area.
+
+        Returns:
+            image (pygame.image): Pygame image for the text button.
+        """
+
+        image = self.font.render(str(self.text), self.antialias, self.color, self.background_color)
+        self.rect = image.get_rect()
+
+        return image
 
 class Picture (pygame.sprite.Sprite):
     """
@@ -280,7 +353,7 @@ class Picture (pygame.sprite.Sprite):
 
         Arguments:
             image (string): Path of image file to be used for picture.
-            pos (tuple): XY position for the picture.
+            pos (list): XY position for the picture.
         """
 
         super(Picture, self).__init__()
@@ -307,7 +380,7 @@ class Picture (pygame.sprite.Sprite):
         Set position of the picture.
 
         Arguments:
-            pos (tuple): XY position to set the picture to.
+            pos (list): XY position to set the picture to.
         """
 
         self.rect.x = pos[0]
@@ -318,73 +391,156 @@ class Text (pygame.sprite.Sprite):
     Text object for MenuManager.
 
     Attributes:
-        text (String): Text to be rendered.
         font (pygame.font): Font used to render the text.
-        pos (tuple): Position of the text.
-        color (List): Color of the text.
-        antialias (Boolean): Adds antialias to text.
-        background_color (List): Background color of the text.
+        text (string): Text to be rendered.
+        antialias (boolean): Adds antialias to text.
+        background_color (list): Background color of the text.
+        color (list): Color of the text.
+        pos (list): Position of the text.
         image (pygame.image): Rendered text.
         rect (pygame.image.rect): Position, height, width values for Text.
     """
 
-    def __init__ (self, text, font, pos = [0,0], color = [255, 255, 255], \
-                  antialias = True, background_color = None):
+    def __init__ (self, font, text, antialias = True, \
+                  background_color = [0, 0, 0], color = [255, 255, 255], \
+                  pos = [0, 0]):
         """
         Instantiates a new Text object.
 
         Arguments:
-            text (String): Text to be rendered.
             font (pygame.font): Font used to render the text.
-            pos (tuple): Position of the text.
-            color (List): Color of the text.
+            text (String): Text to be rendered.
             antialias (Boolean): Adds antialias to text.
-            background_color (List): Background color of the text.
+            background_color (list): Background color of the text.
+            color (list): Color of the text.
+            pos (list): Position of the text.
         """
 
         super(Text, self).__init__()
 
-        self.text = text
         self.font = font
-        self.pos = pos
-        self.color = color
+        self.text = text
+
         self.antialias = antialias
         self.background_color = background_color
+        self.color = color
+        self.pos = pos
 
-        self.image = font.render(str(text), antialias, color, background_color)
-        self.image.set_colorkey(menu_manager_settings["element_colorkey"])
+        self.image = self.__render()
+        self.image.set_colorkey([0, 0, 0])
         self.rect = self.image.get_rect()
         self.rect.x = pos[0]
         self.rect.y = pos[1]
 
-    def get_pos (self):
+    def get_antialias (self):
         """
-        Get the position of this text element.
+        Get antialias boolean.
 
         Returns:
-            pos (list): XY position of the text.
+            antialias (boolean): True if antialias is set to True, False
+                                 otherwise.
+        """
+
+        return self.antialias
+
+    def get_background_color (self):
+        """
+        Get the background color of the text.
+
+        Returns:
+            background_color (list): RGB values for the background color of the
+                                     text.
+        """
+
+        return self.background_color
+
+    def get_pos (self):
+        """
+        Get the position of this text button element.
+
+        Returns:
+            pos (list): XY position of the text button.
         """
 
         position = [self.rect.x, self.rect.y]
         return position
+
+    def get_color (self):
+        """
+        Get the color of this text button element.
+
+        Returns:
+            color (list): RGB values for the color of this text button.
+        """
+
+        return self.color
+
+    def set_antialias (self, new_antialias):
+        """
+        Set the antialias boolean for the text.
+
+        Arguments:
+            new_antialias (boolean): Antialias boolean. True for on, False for
+                                     off.
+        """
+
+        self.antialias = new_antialias
+        self.__render()
+
+    def set_background_color (self, new_background_color):
+        """
+        Set the background color of the text.
+
+        Arguments:
+            new_background_color (list): RGB values for the background color of
+                                         the text. Should be 3 integers.
+        """
+
+        self.background_color = new_background_color
+        self.__render()
 
     def set_pos (self, pos):
         """
         Set position of the text.
 
         Arguments:
-            pos (list): XY position to set the text to.
+            pos (list): XY position to set the text button to.
         """
 
         self.rect.x = pos[0]
         self.rect.y = pos[1]
+
+    def set_color (self, new_color):
+        """
+        Set the color of the text.
+
+        Arguments:
+            new_color (list): RGB values for the new color of this text button.
+        """
+
+        self.color = new_color
+        self.__render()
+
+    def __render (self):
+        """
+        Render the image of the button using the attributes of this instance.
+        Also updates rect in case text change alters rect area.
+
+        Returns:
+            image (pygame.image): Pygame image for the text button.
+        """
+
+        image = self.font.render(str(self.text), self.antialias, self.color, self.background_color)
+        self.rect = image.get_rect()
+
+        return image
 
 class MenuManager:
     """
     Menu manager for pygame.
 
     Attributes:
-        pages (List): List of pages in the menu manager.
+        pages (list): List of pages in the menu manager.
         current_page (Page): Page currently being displayed.
         screen (pygame.display): Surface to blit the pages and game to.
         clock (pygame.time.Clock): Used to set/cap game FPS.
@@ -539,7 +695,7 @@ class Page:
 
     Attributes:
         id (string/int): ID for this page.
-        elements (List): List of elements on the page.
+        elements (list): List of elements on the page.
 
     NOTE: The ID doesn't have to be a string/int, it just has to be some
           distinct identifier for this page. I just recommend using a string or

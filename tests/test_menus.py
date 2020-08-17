@@ -1,3 +1,3 @@
 import unittest
 
-from .nhefner_pygame_menus import nhefner_pygame_menus
+from nhefner_pygame_menus.nhefner_pygame_menus.menus import *

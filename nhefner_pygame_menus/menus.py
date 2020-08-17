@@ -1,7 +1,7 @@
 """
 Noah Hefner
 Pygame Menu System
-Last Edit: 10 August 2020
+Last Edit: 17 August 2020
 """
 
 # Imports
@@ -10,6 +10,14 @@ import string
 
 # Initialize pygame
 pygame.init()
+
+# Constants
+MENU_FPS_RANGE = {
+
+    "minimum" : 30,
+    "maximum" : 144
+
+}
 
 # Settings
 menu_manager_settings = {
@@ -20,23 +28,66 @@ menu_manager_settings = {
 
 }
 
-def set_menu_fps (new_fps):
-
-    try:
-        menu_manager_settings["menu_fps"] = int(new_fps)
-    except:
-        print("Invalid menu fps!")
-
 def set_menu_element_colorkey (new_colorkey):
+    """
+    Set the colorkey for menu elements.
 
+    Arguments:
+        new_colorkey (list): RGB values for colorkey. List of 3 integers.
+    """
+
+    # Ensure new_colorkey is a 3 element list
     assert(len(new_colorkey) == 3)
 
     for i in range(3):
 
         try:
+            # Ensure each element is an integer
             int(new_colorkey[i])
         except:
             print("Invalid menu element colorkey!")
+            return
+
+        # Ensure each value is in the RGB spectrum
+        assert(new_colorkey[i] > 0 and new_colorkey[i] < 255)
+
+    # Set as new colorkey if new_colorkey passed all the tests
+    menu_manager_settings["element_colorkey"] = new_colorkey
+
+def set_menu_background_color (new_background_color):
+
+    # Ensure new_background_color is a 3 element list
+    assert(len(new_background_color) == 3)
+
+    for i in range(3):
+
+        try:
+            # Ensure each element is an integer
+            int(new_background_color[i])
+        except:
+            print("Invalid menu background color!")
+            return
+
+        # Ensure each value is in the RGB spectrum
+        assert(new_background_color[i] > 0 and new_background_color[i] < 255)
+
+    # Set as new background color if new_background_color passed all the tests
+    menu_manager_settings["menu_background_color"] = new_background_color
+
+def set_menu_fps (new_fps):
+
+    try:
+        # Ensure new_fps is an integer
+        int(new_fps)
+    except:
+        print("Invalid menu fps!")
+
+    # Ensure new_fps is in the acceptable range
+    assert(int(new_fps) >= MENU_FPS_RANGE["minimum"])
+    assert(int(new_fps) <= MENU_FPS_RANGE["maximum"])
+
+    # Set as new menu fps if new_fps passed all the tests
+    menu_manager_settings["menu_fps"] = int(new_fps)
 
 class Action:
     """
@@ -88,7 +139,7 @@ class ButtonPicture(pygame.sprite.Sprite):
             image (string): Path of image file to be used for button.
             action (function): Function to execute when button is pressed.
             action_args (*args): Any arguments required by the action.
-            pos (tuple): XY position for the button.
+            pos (list): XY position for the button.
         """
 
         super(ButtonPicture, self).__init__()
@@ -116,7 +167,7 @@ class ButtonPicture(pygame.sprite.Sprite):
         Set position of the button.
 
         Arguments:
-            pos (tuple): XY position to set the button to.
+            pos (list): XY position to set the button to.
         """
 
         self.rect.x = pos[0]
@@ -149,7 +200,7 @@ class ButtonPicture(pygame.sprite.Sprite):
         Returns true if the mouse cursor position is on this sprite.
 
         Arguments:
-            mouse_pos (tuple): XY position of the cursor.
+            mouse_pos (list): XY position of the cursor.
         """
 
         # Check x axis
@@ -182,7 +233,7 @@ class ButtonText (pygame.sprite.Sprite):
             font (pygame.font.SysFont): Font to render the text in.
             action (function): Function to execute when button is pressed.
             action_args (*args): Any arguments required by the action.
-            pos (tuple): XY position for the button.
+            pos (list): XY position for the button.
         """
 
         super(ButtonText, self).__init__()
@@ -271,7 +322,7 @@ class ButtonText (pygame.sprite.Sprite):
         Returns true if the mouse cursor position is on this sprite.
 
         Arguments:
-            mouse_pos (tuple): XY position of the cursor.
+            mouse_pos (list): XY position of the cursor.
         """
 
         # Check x area
@@ -298,7 +349,7 @@ class Picture (pygame.sprite.Sprite):
 
         Arguments:
             image (string): Path of image file to be used for picture.
-            pos (tuple): XY position for the picture.
+            pos (list): XY position for the picture.
         """
 
         super(Picture, self).__init__()
@@ -325,7 +376,7 @@ class Picture (pygame.sprite.Sprite):
         Set position of the picture.
 
         Arguments:
-            pos (tuple): XY position to set the picture to.
+            pos (list): XY position to set the picture to.
         """
 
         self.rect.x = pos[0]
@@ -338,7 +389,7 @@ class Text (pygame.sprite.Sprite):
     Attributes:
         text (String): Text to be rendered.
         font (pygame.font): Font used to render the text.
-        pos (tuple): Position of the text.
+        pos (list): Position of the text.
         color (List): Color of the text.
         antialias (Boolean): Adds antialias to text.
         background_color (List): Background color of the text.
@@ -354,7 +405,7 @@ class Text (pygame.sprite.Sprite):
         Arguments:
             text (String): Text to be rendered.
             font (pygame.font): Font used to render the text.
-            pos (tuple): Position of the text.
+            pos (list): Position of the text.
             color (List): Color of the text.
             antialias (Boolean): Adds antialias to text.
             background_color (List): Background color of the text.

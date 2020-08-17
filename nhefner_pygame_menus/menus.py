@@ -20,6 +20,24 @@ menu_manager_settings = {
 
 }
 
+def set_menu_fps (new_fps):
+
+    try:
+        menu_manager_settings["menu_fps"] = int(new_fps)
+    except:
+        print("Invalid menu fps!")
+
+def set_menu_element_colorkey (new_colorkey):
+
+    assert(len(new_colorkey) == 3)
+
+    for i in range(3):
+
+        try:
+            int(new_colorkey[i])
+        except:
+            print("Invalid menu element colorkey!")
+
 class Action:
     """
     Holds function and argument data for buttons.

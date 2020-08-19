@@ -1,0 +1,10 @@
+TESTING INSTRUCTIONS
+
+Well since I can't figure out how to import files from a sibling directory,
+the best implementation I have come up with is to just copy the menus.py file
+into the tests folder every time I want to test something new.
+
+I guess it's not that big of a deal since I am the only developer on this
+project.
+
+Maybe one day I will find a better solution.

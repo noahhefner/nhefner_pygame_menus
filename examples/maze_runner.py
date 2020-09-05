@@ -1,4 +1,20 @@
 """
+
+This game is borrowed from programarcadegames.com.
+
+Simpson College Computer Science
+Sample Python/Pygame Programs
+http://programarcadegames.com/
+http://simpson.edu/computer-science/
+
+From:
+http://programarcadegames.com/python_examples/f.php?file=maze_runner.py
+
+Explanation video:
+http://youtu.be/5-SbFanyUkQ
+"""
+
+"""
 This script shows how to implement a menu system with nhefner_pygame_menus. The
 general structure should be laid out as follows:
 
@@ -30,25 +46,8 @@ if __name__ == "__main__":
     main()
     pygame.quit()
 
-Sample Python/Pygame Programs
-Simpson College Computer Science
-http://programarcadegames.com/
-http://simpson.edu/computer-science/
-
-From:
-http://programarcadegames.com/python_examples/f.php?file=maze_runner.py
-
-Explanation video: http://youtu.be/5-SbFanyUkQ
-
-Part of a series:
-http://programarcadegames.com/python_examples/f.php?file=move_with_walls_example.py
-http://programarcadegames.com/python_examples/f.php?file=maze_runner.py
-http://programarcadegames.com/python_examples/f.php?file=platform_jumper.py
-http://programarcadegames.com/python_examples/f.php?file=platform_scroller.py
-http://programarcadegames.com/python_examples/f.php?file=platform_moving.py
-http://programarcadegames.com/python_examples/sprite_sheets/
-
 """
+
 import pygame
 
 # Imports for the menu system
@@ -61,13 +60,6 @@ BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 PURPLE = (255, 0, 255)
-
-game_settings = {
-
-    "player_color" : WHITE
-
-}
-
 
 class Wall(pygame.sprite.Sprite):
     """This class represents the bar at the bottom that the player controls """
@@ -104,7 +96,7 @@ class Player(pygame.sprite.Sprite):
 
         # Set height, width
         self.image = pygame.Surface([15, 15])
-        self.image.fill(WHITE)
+        self.image.fill(BLUE)
 
         # Make our top-left corner the passed-in location.
         self.rect = self.image.get_rect()
@@ -282,26 +274,35 @@ def main():
     button_play = ButtonText("PLAY", font, pos = [20, 375], background_color = [255, 0, 0])
     button_options = ButtonText("OPTIONS", font, pos = [20, 400], background_color = [255, 0, 0])
     button_quit = ButtonText("QUIT", font, pos = [20, 425], background_color = [255, 0, 0])
-    # When making buttons, we need to use the add_action method to define their functionality
-    # If the function requires arguments, we simply pass them to the add_action method after
-    # the function name.
-    button_play.add_action(man.exit_menu)
+
+    """
+    When making buttons, we need to use the add_action method to define
+    their functionality. If the function requires arguments, we simply pass them
+    to the add_action method after the function name.
+    """
+    button_play.add_action(man.exit_menu) # exit_menu has no arguments, so no
+                                          # need to pass anything else.
+
     button_options.add_action(man.navigate, "options") # Function with arguments example.
                                                        # The navigate function on the MenuManager
                                                        # takes one argument, the id of the page we
                                                        # want to navigate to, so we pass the id of
                                                        # our options page as an argument to the
                                                        # add_action method.
+
     button_quit.add_action(man.navigate, "confirm_exit")
 
 
-    button_back_op = ButtonText("BACK", font, pos = [10, 10], background_color = [255, 0, 0])
-    button_blue_player = ButtonText("BLUE", font, pos = [10, 50])
-    button_red_player = ButtonText("RED", font, pos = [10, 90])
+    button_back_op = ButtonText("BACK", font, pos = [10, 10])
+    button_blue_player = ButtonText("BLUE", font, pos = [20, 50])
+    button_red_player = ButtonText("RED", font, pos = [20, 90])
+    selection_indicator = Picture("selection_dot.png", pos = [8, 65])
 
     button_back_op.add_action(man.navigate, "home")
     button_blue_player.add_action(player.set_color, BLUE)
+    button_blue_player.add_action(selection_indicator.set_pos, [8, 65])
     button_red_player.add_action(player.set_color, RED)
+    button_red_player.add_action(selection_indicator.set_pos, [8, 105])
     # Notice we can use the set_color method on the Player class to change the
     # color of the player when the user presses this button.
 
@@ -320,6 +321,7 @@ def main():
     options.add_element(button_back_op)
     options.add_element(button_blue_player)
     options.add_element(button_red_player)
+    options.add_element(selection_indicator)
 
     confirm_exit.add_element(text_confirmation)
     confirm_exit.add_element(button_yes)
@@ -331,7 +333,7 @@ def main():
     man.add_page(confirm_exit)
 
     # Step Six: Set a start page
-    man.set_start_page(home)
+    man.set_start_page("home")
 
     """
     NOTICE: Put everything in an infinite loop. WHat will happen is that after
@@ -340,14 +342,16 @@ def main():
     while True:
 
         # Call this function to run the menu manager
-        man.do_menu_stuff()
+        man.run()
 
-        # Game code goes here, use while loop as normal
+        """
+        Game code goes here, use while loop as normal. The game should be
+        written such that in_game is set to False when the game is over.
+        """
         in_game = True
         while in_game:
 
             # --- Event Processing ---
-
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit() # Kill the program when we hit the X
@@ -373,7 +377,6 @@ def main():
                         player.changespeed(0, -5)
 
             # --- Game Logic ---
-
             player.move(current_room.wall_list)
 
             if player.rect.x < 0:

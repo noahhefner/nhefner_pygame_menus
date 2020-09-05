@@ -409,8 +409,8 @@ class Text (pygame.sprite.Sprite):
 
         Arguments:
             font (pygame.font): Font used to render the text.
-            text (String): Text to be rendered.
-            antialias (Boolean): Adds antialias to text.
+            text (string): Text to be rendered.
+            antialias (boolean): Adds antialias to text.
             background_color (list): Background color of the text.
             color (list): Color of the text.
             pos (list): Position of the text.
@@ -540,24 +540,31 @@ class MenuManager:
     Menu manager for pygame.
 
     Attributes:
-        pages (list): List of pages in the menu manager.
-        current_page (Page): Page currently being displayed.
-        screen (pygame.display): Surface to blit the pages and game to.
         clock (pygame.time.Clock): Used to set/cap game FPS.
-        start_page_set (Boolean): Switch that checks if start page has been set.
+        screen (pygame.display): Surface to blit the pages and game to.
+        current_page (Page): Page currently being displayed.
+        exiting (boolean): Switch that triggers the menu to exit.
+        pages (list): List of pages in the menu manager.
+        start_page_id (string/int): Page id for the starting page.
     """
 
-    def __init__ (self, screen, clock):
+    def __init__ (self, clock, screen):
         """
         Instantiate a MenuManager object.
+
+        Arguments:
+            screen (pygame.display): Window in which to render the menu.
+            clock (pygame.time.Clock): Clock for the window.
         """
 
-        self.pages = list()
-        self.current_page = None
-        self.screen = screen
         self.clock = clock
-        self.start_page = None
+        self.screen = screen
+
+        self.current_page = None
         self.exiting = False
+        self.pages = list()
+        self.start_page_id = None
+
 
     def run (self):
         """
@@ -584,7 +591,7 @@ class MenuManager:
         before calling ManuManager.run() or the program will be terminated.
 
         Arguments:
-            page_id (String/Int): ID of the desired page destination.
+            page_id (string/int): ID of the desired page destination.
 
         NOTE: See Page class for more info on page id's.
 
@@ -595,7 +602,7 @@ class MenuManager:
             if (page_id == page.id):
 
                 self.current_page = page
-                self.start_page = page
+                self.start_page_id = page_id
                 return
 
         print("Invalid start page id!")
@@ -606,7 +613,7 @@ class MenuManager:
         Sets the currently showing page using the id attribute of Page class.
 
         Arguments:
-            page_id (String/Int): ID of the desired page destination.
+            page_id (string/int): ID of the desired page destination.
 
         NOTE: See Page class for more info on page id's.
         """
@@ -653,10 +660,10 @@ class MenuManager:
         beem set.
 
         Returns:
-            Boolean: True if program execution should continue, False otherwise.
+            boolean: True if we should stay in the menus, False otherwise.
         """
 
-        if self.start_page == None:
+        if self.start_page_id == None:
 
             print("Start page not set!")
             self.kill_program()
@@ -664,7 +671,7 @@ class MenuManager:
         if self.exiting:
 
             self.exiting = False
-            self.current_page = self.start_page
+            self.navigate(self.start_page_id)
 
             return False
 

@@ -4,13 +4,13 @@ These python modules provide an easy way to implement a menu system for games wr
 ![Screenshot One](/screenshots/home.PNG)
 
 ### About These Modules
-This menu system is built using pygames existing modules. GUI elements are represented using pygame's Sprite module.
+This menu system is built using pygames existing modules. GUI elements are represented using pygames Sprite module.
 
 Here is a list of the tools provided by nhefner_pygame_menus:
 
-**ButtonPicture:** This class provides functionality for a button represented by a picture. The user can use the add_action method on this class to attatch callback functions that will be executed when this button is pressed.
+**ButtonPicture:** This class provides functionality for a button represented by a picture. The user can use the add_action method on this class to attach callback functions that will be executed when this button is pressed.
 
-**ButtonText:** This class provides functionality for a button represented by text (string). The user can use the add_action method on this class to attatch callback functions that will be executed when this button is pressed.
+**ButtonText:** This class provides functionality for a button represented by text (string). The user can use the add_action method on this class to attach callback functions that will be executed when this button is pressed.
 
 **Picture:** This class allows for adding images to the menu system. It has none of the capabilities of ButtonPicture and is purely for aesthetic purposes.
 
@@ -18,4 +18,4 @@ Here is a list of the tools provided by nhefner_pygame_menus:
 
 **Page:** This class represents one page of the menu system. The programmer can add instances of ButtonPicture, ButtonText, Picture, or Text to a Page object.
 
-**MenuManager:** This class is the brains of the menu system. The programer can add instances of Page to the MenuManager.
+**MenuManager:** This class is the brains of the menu system. The programmer can add instances of Page to the MenuManager.

@@ -463,6 +463,9 @@ class MenuManager:
 
                 return
 
+        print("Invalid page id, " + str(page_id) + "! Exiting.")
+        exit(-1)
+
     def exit_menu (self):
         """
         For exiting the menu manager. Flips the exiting flag.

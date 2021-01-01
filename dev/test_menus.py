@@ -1,16 +1,19 @@
 """
 Noah Hefner
 Pygame Menu System Test Script
-Last Edit: 30 December 2020
+Last Edit: 1 January 2021
 
 Theres not really a good way to write a test script for these modules, so I
 essentially just tried to test all the functionality I could with a simple menu
 system implementation.
+
+Run the update_dist.sh script to copy the contents of test_menus.py to
+nhefner_pygame_menus/menus.py.
 """
 
 # Imports
 import pygame
-from menus import MenuManager, Page, ButtonText, ButtonPicture, Picture, Text
+from menus_dev import MenuManager, Page, ButtonText, ButtonPicture, Picture, Text
 
 # Constants
 SCREEN_WIDTH = 800
@@ -34,7 +37,7 @@ def main ():
     pygame.display.set_caption('Pygame Module Testing')
 
     # Font that we use for text buttons
-    font = pygame.font.SysFont("C059", 40)
+    font = pygame.font.SysFont("Ubuntu-B", 60)
 
     # Create the menu manager
     man = MenuManager(screen, clock)
@@ -52,8 +55,30 @@ def main ():
     dims = game_title.get_dimensions()
     game_title.set_pos([SCREEN_CENTER_X - (dims[0] / 2), 20])
 
+    start_button = ButtonText("START", font, pos = [10, 300],
+                              color = [255, 0, 0], antialias = True)
+    char_select_button = ButtonText("SELECT CHARACTER", font, pos = [10, 400],
+                                    color = [255, 0, 0], antialias = True)
+    quit_button = ButtonText("QUIT", font, pos = [10, 500],
+                             color = [255, 0, 0], antialias = True)
+
+    # Add actions to home elements
+    char_select_button.add_action(man.navigate, "character_select")
+    quit_button.add_action(man.kill_program)
+
+    # Character select elements
+    back_button = ButtonText("BACK", font, pos = [10, 10])
+
+    # Add actions to character select elements
+    back_button.add_action(man.navigate, "home")
+
     # Add elements to each page
     home.add_element(game_title)
+    home.add_element(start_button)
+    home.add_element(char_select_button)
+    home.add_element(quit_button)
+
+    character_select.add_element(back_button)
 
     # Setting the start page
     man.set_start_page("home")

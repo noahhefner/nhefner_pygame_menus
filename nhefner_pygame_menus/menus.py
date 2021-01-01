@@ -1,7 +1,7 @@
 """
 Noah Hefner
 Pygame Menu System
-Last Edit: 10 August 2020
+Last Edit: 1 January 2021
 """
 
 # Imports
@@ -82,12 +82,25 @@ class ButtonPicture(pygame.sprite.Sprite):
         self.rect.y = pos[1]
         self.actions = []
 
+    def get_dimensions (self):
+        """
+        Get the width and height of the ButtonPicture.
+
+        Returns:
+            list: Width and Height of the ButtonPicture. Uses width and height
+                  from self.rect.
+                  Format: [width, height]
+        """
+
+        dimensions = [self.rect.width, self.rect.height]
+        return dimensions
+
     def get_pos (self):
         """
         Get the position of this picture button element.
 
         Returns:
-            pos (list): XY position of the picture button.
+            list: XY position of the picture button.
         """
 
         position = [self.rect.x, self.rect.y]
@@ -98,7 +111,8 @@ class ButtonPicture(pygame.sprite.Sprite):
         Set position of the button.
 
         Arguments:
-            pos (tuple): XY position to set the button to.
+            list: XY position to set the button to.
+                  Format: [x, y]
         """
 
         self.rect.x = pos[0]
@@ -377,6 +391,19 @@ class Text (pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = pos[0]
         self.rect.y = pos[1]
+
+    def get_dimensions (self):
+        """
+        Get the width and height of the Text.
+
+        Returns:
+            list: Width and Height of the Text. Uses width and height from
+                  self.rect.
+                  Format: [width, height]
+        """
+
+        dimensions = [self.rect.width, self.rect.height]
+        return dimensions
 
     def get_pos (self):
         """

@@ -1,7 +1,7 @@
 """
 Noah Hefner
 Pygame Menu System
-Last Edit: 10 August 2020
+Last Edit: 1 January 2021
 """
 
 # Imports

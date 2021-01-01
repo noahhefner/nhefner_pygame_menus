@@ -14,7 +14,7 @@ def main:
 
     while true:
 
-        manager.do_menu_stuff()
+        manager.run()
 
         game_in_progress = True
 
@@ -277,7 +277,7 @@ def main():
     confirm_exit = Page("confirm_exit")
 
     # Step Three: Create elements for the pages
-    font = pygame.font.Font("ARCADECLASSIC.TTF", 40) # Font for text buttons
+    font = pygame.font.SysFont("Ubuntu-B", 40) # Font for text buttons
 
     button_play = ButtonText("PLAY", font, pos = [20, 375], background_color = [255, 0, 0])
     button_options = ButtonText("OPTIONS", font, pos = [20, 400], background_color = [255, 0, 0])
@@ -331,7 +331,7 @@ def main():
     man.add_page(confirm_exit)
 
     # Step Six: Set a start page
-    man.set_start_page(home)
+    man.set_start_page("home")
 
     """
     NOTICE: Put everything in an infinite loop. WHat will happen is that after
@@ -340,7 +340,7 @@ def main():
     while True:
 
         # Call this function to run the menu manager
-        man.do_menu_stuff()
+        man.run()
 
         # Game code goes here, use while loop as normal
         in_game = True

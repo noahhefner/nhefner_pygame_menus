@@ -11,14 +11,10 @@ import string
 # Initialize pygame
 pygame.init()
 
-# Settings
-menu_manager_settings = {
-
-    "element_colorkey" : [0, 0, 0],
-    "menu_background_color" : [0, 0, 0],
-    "menu_fps" : 60
-
-}
+# Some constants
+BLACK    = [0, 0, 0]
+WHITE    = [255, 255, 255]
+MENU_FPS = 60
 
 class Action:
     """
@@ -34,10 +30,10 @@ class Action:
         """
         Instantiate an Action object.
 
-        Arguments:
+        Positional Arguments:
             function: The function to execute.
-            *args: Arguments for the function.
-            **kwargs: Keyword arguments for the function.
+            args: Arguments for the function.
+            kwargs: Keyword arguments for the function.
         """
 
         self.function = function
@@ -46,37 +42,40 @@ class Action:
 
     def execute (self):
         """
-        Calls the function, passing it the args and kwargs.
+        Calls the function, passing in the arguments and keyword arguments from
+        this Action object.
         """
 
         self.function(*self.arguments, **self.keyword_arguments)
 
 class ButtonPicture(pygame.sprite.Sprite):
     """
-    Button object for menu manager.
+    Button that uses a picture as its image. When clicked, the Actions attatched
+    to the button will be executed.
 
     Attributes:
         image (pygame.image): Image for button.
-        action (function): Function to execute when button is pressed.
         rect (pygame.image.rect): Position, height, width values for image.
-        action_args (*args): Any arguments required by the action.
+        actions (list): List of Action objects to be executed when the button is
+                        clicked.
     """
 
-    def __init__ (self, image, pos = [0,0]):
+    def __init__ (self, filename, pos = [0,0], colorkey = BLACK):
         """
-        Instantiate a button object.
+        Instantiate a ButtonPicture object.
 
-        Arguments:
-            image (string): Path of image file to be used for button.
-            action (function): Function to execute when button is pressed.
-            action_args (*args): Any arguments required by the action.
-            pos (tuple): XY position for the button.
+        Positional Arguments:
+            filename (string): Path of image file to be used for button.
+
+        Keyword Arguments:
+            pos (list): XY position for the button. Default is [0,0].
+            colorkey (list): Colorkey for the image used. Default is black.
         """
 
         super(ButtonPicture, self).__init__()
 
-        self.image = pygame.image.load(image)
-        self.image.set_colorkey(menu_manager_settings["element_colorkey"])
+        self.image = pygame.image.load(filename)
+        self.image.set_colorkey(colorkey)
         self.rect = self.image.get_rect()
         self.rect.x = pos[0]
         self.rect.y = pos[1]
@@ -101,6 +100,7 @@ class ButtonPicture(pygame.sprite.Sprite):
 
         Returns:
             list: XY position of the picture button.
+                  Format: [x, y]
         """
 
         position = [self.rect.x, self.rect.y]
@@ -110,7 +110,7 @@ class ButtonPicture(pygame.sprite.Sprite):
         """
         Set position of the button.
 
-        Arguments:
+        Positional Arguments:
             list: XY position to set the button to.
                   Format: [x, y]
         """
@@ -122,7 +122,7 @@ class ButtonPicture(pygame.sprite.Sprite):
         """
         Adds an action to the list of actions for this button.
 
-        Arguments:
+        Positional Arguments:
             function: The function to execute.
             *args: Arguments for the function.
             **kwargs: Keyword arguments for the function.
@@ -144,58 +144,95 @@ class ButtonPicture(pygame.sprite.Sprite):
         """
         Returns true if the mouse cursor position is on this sprite.
 
-        Arguments:
+        Positional Arguments:
             mouse_pos (tuple): XY position of the cursor.
         """
 
         # Check x axis
-        within_x = mouse_pos[0] >= self.rect.x and mouse_pos[0] <= self.rect.x + self.rect.width
+        within_x = mouse_pos[0] >= self.rect.x and \
+                   mouse_pos[0] <= self.rect.x + self.rect.width
 
         # Check y axis
-        within_y = mouse_pos[1] >= self.rect.y and mouse_pos[1] <= self.rect.y + self.rect.height
+        within_y = mouse_pos[1] >= self.rect.y and \
+                   mouse_pos[1] <= self.rect.y + self.rect.height
 
         # True if within x and y area
         return within_x and within_y
 
 class ButtonText (pygame.sprite.Sprite):
     """
-    Text Button object for menu manager.
+    Button that uses text as its image. When clicked, the Actions attatched to
+    the button will be executed.
 
     Attributes:
-        image (pygame.image): Pygame image for the text button.
-        action (function): Function to execute when button is pressed.
+        text (string): Text to make the button from.
+        font (pygame.font.SysFont): Font to render the text in.
+        color (list): Color that the text should be. Should be supplied as a
+                      list of three integers between 0 and 255, inclusive.
+                      Default is [255, 255, 255], or white.
+        background_color (list): Color that the background of the text should
+                                 be. Should be supplied as a list of three
+                                 integers between 0 and 255, inclusive. Default
+                                 is [255, 255, 255], or white.
+        antialias (boolean): True if pygame should antialias the image for the
+                             button. True by default.
+        image (pygame.image): Image for button.
         rect (pygame.image.rect): Position, height, width values for image.
-        action_args (*args): Any arguments required by the action.
+        actions (list): List of Action objects to be executed when the button is
+                        clicked.
     """
 
-    def __init__ (self, text, font, pos = [0,0], color = [255, 255, 255], \
-                  antialias = True, background_color = None):
+    def __init__ (self, text, font, pos = [0,0], color = [255, 255, 255],
+                  background_color = None, antialias = True):
         """
-        Instantiate a button object.
+        Instantiate a ButtonText object.
 
-        Arguments:
+        Positional Arguments:
             text (string): Text to make the button from.
             font (pygame.font.SysFont): Font to render the text in.
-            action (function): Function to execute when button is pressed.
-            action_args (*args): Any arguments required by the action.
+
+        Keyword Arguments:
             pos (tuple): XY position for the button.
+            color (list): Color that the text should be. Should be supplied as a
+                          list of three integers between 0 and 255, inclusive.
+                          Default is [255, 255, 255], or white.
+            background_color (list): Color that the background of the text
+                                     should be. Should be supplied as a list of
+                                     three integers between 0 and 255,
+                                     inclusive. Default is None, or no
+                                     background color.
+            antialias (boolean): True if pygame should antialias the image for
+                                 the button. True by default.
         """
 
         super(ButtonText, self).__init__()
 
         self.text = text
         self.font = font
-        self.antialias = antialias
         self.color = color
         self.background_color = background_color
+        self.antialias = antialias
 
         self.image = font.render(str(text), antialias, color, background_color)
-        self.image.set_colorkey(menu_manager_settings["element_colorkey"])
+        self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.x = pos[0]
         self.rect.y = pos[1]
 
         self.actions = []
+
+    def get_dimensions (self):
+        """
+        Get the width and height of the button.
+
+        Returns:
+            list: Width and Height of the button. Uses width and height from
+                  self.rect.
+                  Format: [width, height]
+        """
+
+        dimensions = [self.rect.width, self.rect.height]
+        return dimensions
 
     def get_pos (self):
         """
@@ -213,7 +250,7 @@ class ButtonText (pygame.sprite.Sprite):
         Get the text of the button.
 
         Returns:
-            self.text (String): Text of the button.
+            self.text (string): Text of the button.
         """
 
         return self.text
@@ -222,7 +259,7 @@ class ButtonText (pygame.sprite.Sprite):
         """
         Set position of the text.
 
-        Arguments:
+        Positional Arguments:
             pos (list): XY position to set the text button to.
         """
 
@@ -233,7 +270,7 @@ class ButtonText (pygame.sprite.Sprite):
         """
         Changes the text of the button.
 
-        Arguments:
+        Positional Arguments:
             new_text (String): New text of the button.
         """
 
@@ -244,7 +281,7 @@ class ButtonText (pygame.sprite.Sprite):
         """
         Adds an action to the list of actions for this button.
 
-        Arguments:
+        Positional Arguments:
             function: The function to execute.
             *args: Arguments for the function.
             **kwargs: Keyword arguments for the function.
@@ -266,7 +303,7 @@ class ButtonText (pygame.sprite.Sprite):
         """
         Returns true if the mouse cursor position is on this sprite.
 
-        Arguments:
+        Positional Arguments:
             mouse_pos (tuple): XY position of the cursor.
         """
 
@@ -288,22 +325,39 @@ class Picture (pygame.sprite.Sprite):
         rect (pygame.image.rect): Position, height, width values for picture.
     """
 
-    def __init__ (self, image, pos = [0,0]):
+    def __init__ (self, filename, pos = [0,0], colorkey = BLACK):
         """
-        Instantiate a picture object.
+        Instantiate a Picture object.
 
-        Arguments:
-            image (string): Path of image file to be used for picture.
-            pos (tuple): XY position for the picture.
+        Positional Arguments:
+            filename (string): Path of image file to be used for picture.
+
+        Keyword Arguments:
+            pos (tuple): XY position for the picture. Default is [0, 0].
+            colorkey (list): Colorkey for the picture file used. Default is
+                             black.
         """
 
         super(Picture, self).__init__()
 
-        self.image = pygame.image.load(image)
-        self.image.set_colorkey(menu_manager_settings["element_colorkey"])
+        self.image = pygame.image.load(filename)
+        self.image.set_colorkey(colorkey)
         self.rect = self.image.get_rect()
         self.rect.x = pos[0]
         self.rect.y = pos[1]
+
+    def get_dimensions (self):
+        """
+        Get the width and height of the picture.
+
+        Returns:
+            list: Width and Height of the picture. Uses width and height from
+                  self.rect.
+                  Format: [width, height]
+        """
+
+        dimensions = [self.rect.width, self.rect.height]
+        return dimensions
 
     def get_pos (self):
         """
@@ -327,13 +381,18 @@ class Picture (pygame.sprite.Sprite):
         self.rect.x = pos[0]
         self.rect.y = pos[1]
 
-    def set_image (self, new_image):
+    def set_picture (self, new_image, new_colorkey = BLACK):
         """
         Set a new picture for this instance of Picture. Preserves x and y
         position of the old picture.
 
-        Arguments:
-            new_image (String): File name of the new picture.
+        Positional Arguments:
+            new_image (string): File name of the new picture.
+
+        Keyword Arguments:
+            new_colorkey (list): Colorkey for the picture file used. Should be
+                                 given as a list of three integers. Default is
+                                 black.
         """
 
         # Store the current position
@@ -341,7 +400,7 @@ class Picture (pygame.sprite.Sprite):
 
         # Load the new image
         self.image = pygame.image.load(new_image)
-        self.image.set_colorkey(menu_manager_settings["element_colorkey"])
+        self.image.set_colorkey(new_colorkey)
         self.rect = self.image.get_rect()
 
         # Set the x and y position using the old position
@@ -363,14 +422,16 @@ class Text (pygame.sprite.Sprite):
         rect (pygame.image.rect): Position, height, width values for Text.
     """
 
-    def __init__ (self, text, font, pos = [0,0], color = [255, 255, 255], \
+    def __init__ (self, text, font, pos = [0,0], color = WHITE, \
                   antialias = True, background_color = None):
         """
         Instantiates a new Text object.
 
-        Arguments:
+        Positional Arguments:
             text (String): Text to be rendered.
             font (pygame.font): Font used to render the text.
+
+        Keyword Arguments:
             pos (tuple): Position of the text.
             color (List): Color of the text.
             antialias (Boolean): Adds antialias to text.
@@ -384,10 +445,9 @@ class Text (pygame.sprite.Sprite):
         self.pos = pos
         self.color = color
         self.antialias = antialias
-        self.background_color = background_color
 
         self.image = font.render(str(text), antialias, color, background_color)
-        self.image.set_colorkey(menu_manager_settings["element_colorkey"])
+        self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.x = pos[0]
         self.rect.y = pos[1]
@@ -427,6 +487,36 @@ class Text (pygame.sprite.Sprite):
         self.rect.x = pos[0]
         self.rect.y = pos[1]
 
+    def set_text (self, new_text, new_font, new_color = WHITE, \
+                  new_antialias = True, new_background_color = None):
+        """
+        Set a new string as the text. Maintains the x and y position of the
+        original text.
+
+        Positional Arguments:
+            text (String): Text to be rendered.
+            font (pygame.font): Font used to render the text.
+
+        Keyword Arguments:
+            pos (tuple): Position of the text.
+            color (List): Color of the text.
+            antialias (Boolean): Adds antialias to text.
+            background_color (List): Background color of the text.
+        """
+
+        # Store the current position
+        temp_old_pos = self.get_pos()
+
+        # Re-render the text, setting image and rect
+        self.image = font.render(str(new_text), new_antialias, new_color, \
+                                 new_background_color)
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+
+        # Set the x and y position using the old position
+        self.rect.x = temp_old_pos[0]
+        self.rect.y = temp_old_pos[1]
+
 class MenuManager:
     """
     Menu manager for pygame.
@@ -439,29 +529,36 @@ class MenuManager:
         start_page_set (Boolean): Switch that checks if start page has been set.
     """
 
-    def __init__ (self, screen, clock):
+    def __init__ (self, screen, clock, background_color = BLACK):
         """
         Instantiate a MenuManager object.
 
-        Arguments:
+        Positional Arguments:
             screen (pygame.Surface): Surface we are blitting objects to.
             clock (pygame.time.Clock): Pygame clock.
+
+        Keyword Arguments:
+            background_color (list): Background color for the menu system.
+                                     Should be supplied as a list of three
+                                     integers. Default is black.
 
         NOTE: For the menu manager system to work as intended, you will want to
               use the same screen and clock objects for the menu manager and
               your game.
         """
 
-        self.pages = list()
-        self.current_page = None
         self.screen = screen
         self.clock = clock
+        self.background_color = background_color
+        self.pages = list()
+        self.current_page = None
         self.start_page = None
         self.exiting = False
 
     def run (self):
         """
-        Puts the menu loop into a function for ease of use.
+        Update and display the menu system. Puts the menu loop into a function
+        for ease of use.
         """
 
         while self.__update():
@@ -487,7 +584,6 @@ class MenuManager:
             page_id (String/Int): ID of the desired page destination.
 
         NOTE: See Page class for more info on page id's.
-
         """
 
         for page in self.pages:
@@ -499,7 +595,7 @@ class MenuManager:
                 return
 
         print("Invalid start page id!")
-        exit()
+        exit(-1)
 
     def navigate (self, page_id):
         """
@@ -542,12 +638,12 @@ class MenuManager:
         """
 
         # Fill background
-        self.screen.fill(menu_manager_settings["menu_background_color"])
+        self.screen.fill(self.background_color)
 
         # Display current screen
         self.current_page.display(self.screen)
         pygame.display.flip()
-        self.clock.tick(menu_manager_settings["menu_fps"])
+        self.clock.tick(MENU_FPS)
 
     def __update (self):
         """
@@ -556,14 +652,16 @@ class MenuManager:
         beem set.
 
         Returns:
-            Boolean: True if program execution should continue, False otherwise.
+            boolean: True if program execution should continue, False otherwise.
         """
 
+        # Ensure start page has been set
         if self.start_page == None:
 
             print("Start page not set!")
-            self.kill_program()
+            exit(-1)
 
+        # Exit procedures, resets current page to start page
         if self.exiting:
 
             self.exiting = False
@@ -573,16 +671,19 @@ class MenuManager:
 
         for event in pygame.event.get():
 
+            # Window close
             if event.type == pygame.QUIT:
 
                 self.kill_program()
 
+            # Left mouse click
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 
                 mouse_pos = pygame.mouse.get_pos()
 
                 for element in self.current_page.elements:
 
+                    # Check fif we clicked a button type
                     if isinstance(element, ButtonPicture) or \
                        isinstance(element, ButtonText):
 
@@ -598,7 +699,7 @@ class Page:
 
     Attributes:
         id (string/int): ID for this page.
-        elements (List): List of elements on the page.
+        elements (list): List of elements on the page.
 
     NOTE: The ID doesn't have to be a string/int, it just has to be some
           distinct identifier for this page. I just recommend using a string or

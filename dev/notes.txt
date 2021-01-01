@@ -1,0 +1,47 @@
+Action
+    init
+    execute
+ButtonPicture
+    init
+    get_dimensions
+    get_pos
+    set_pos
+    add_action
+    execute_actions
+    is_clicked
+ButtonText
+    init
+    get_dimensions
+    get_pos
+    get_text
+    set_pos
+    set_text
+    add_action
+    execute_actions
+    is_clicked
+Picture
+    init
+    get_dimensions
+    get_pos
+    set_pos
+    set_image
+Text
+    init
+    get_dimensions
+    get_pos
+    set_pos
+    set_text
+MenuManager
+    init
+    run
+    add_page
+    set_start_page
+    navigate
+    exit_menu
+    kill_program
+    __display
+    __update
+Page
+    init
+    add_element
+    display

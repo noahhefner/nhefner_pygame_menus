@@ -40,7 +40,7 @@ def main ():
     font = pygame.font.SysFont("Ubuntu-B", 60)
 
     # Create the menu manager
-    man = MenuManager(screen, clock)
+    man = MenuManager(screen, clock, background_color = [0, 0, 0])
 
     # Create some pages
     home = Page("home")
@@ -55,12 +55,14 @@ def main ():
     dims = game_title.get_dimensions()
     game_title.set_pos([SCREEN_CENTER_X - (dims[0] / 2), 20])
 
-    start_button = ButtonText("START", font, pos = [10, 300],
-                              color = [255, 0, 0], antialias = True)
+    start_button = ButtonPicture("images/button_play.png", pos = [10, 300])
     char_select_button = ButtonText("SELECT CHARACTER", font, pos = [10, 400],
-                                    color = [255, 0, 0], antialias = True)
+                                    color = [255, 0, 0])
     quit_button = ButtonText("QUIT", font, pos = [10, 500],
-                             color = [255, 0, 0], antialias = True)
+                             color = [255, 0, 0])
+    coin = Picture("images/coin.png")
+    dims = coin.get_dimensions()
+    coin.set_pos([SCREEN_WIDTH - 10 - dims[0], SCREEN_HEIGHT - 10 - dims[1]])
 
     # Add actions to home elements
     char_select_button.add_action(man.navigate, "character_select")
@@ -77,6 +79,7 @@ def main ():
     home.add_element(start_button)
     home.add_element(char_select_button)
     home.add_element(quit_button)
+    home.add_element(coin)
 
     character_select.add_element(back_button)
 
@@ -89,3 +92,4 @@ def main ():
 if __name__ == "__main__":
 
     main()
+    pygame.quit()

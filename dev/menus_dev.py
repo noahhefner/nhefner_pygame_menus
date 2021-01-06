@@ -7,6 +7,7 @@ Last Edit: 1 January 2021
 # Imports
 import pygame
 import string
+import os.path
 
 # Initialize pygame
 pygame.init()
@@ -554,6 +555,8 @@ class MenuManager:
         self.current_page = None
         self.start_page = None
         self.exiting = False
+        self.screen_width, self.screen_height = pygame.display.get_surface().get_size()
+        self.highscore_list = list()
 
     def run (self):
         """
@@ -631,6 +634,110 @@ class MenuManager:
         """
 
         exit()
+
+    def add_highscore_page (self, button, back_page_id, font,
+                            num_highscores = 5,
+                            hs_score_file = "highscores.txt"):
+        """
+        Adds a highscore page to the MenuManager.
+
+        Positional Arguments:
+            button (ButtonText, ButtonPicture): The button you want to use to
+                                                navigate to the highscore page.
+            back_page_id (Page): The highscore page has a back button.
+                                 "back_page_id" should be the ID of the page you
+                                 want to return to when the back button is
+                                 pressed.
+            font (pygame.font.Font/Sysfont): Font used to render the Text
+                                             objects on the highscore page.
+
+        Keyword Arguments:
+            hs_score_file (string): Path to the file where highscores are saved.
+                                    Default is in cwd with filename
+                                    "highscores.txt".
+
+        Prerequisites:
+            - The button passed as the "button" argument should be of type
+              ButtonText or ButtonPicture.
+            - The page with ID back_page_id should be a page that is already in
+              the MenuManager.
+        """
+
+        # Create the highscore page
+        highscore_page = Page("highscores")
+
+        # Add navigation action to the button
+        button.add_action(self.navigate, "highscores")
+
+        # Fetch the highscores and usernames from the highscores.txt file
+        users = []
+        scores = []
+
+        with open(hs_score_file) as f:
+
+            contents = f.readlines()
+
+            for line in contents:
+
+                user_score = line.strip().split(" ")
+
+                if len(user_score) == 2:
+
+                    users.append(user_score[0])
+                    scores.append(user_score[1])
+
+        screen_center_x = self.screen_width / 2
+        vert_division = self.screen_height / num_highscores + 1
+
+        # Create UI elements and add them to the highscore page
+        button_back = ButtonText("Back", font, pos = [10, 10])
+        button_back.add_action(self.navigate, back_page_id)
+        highscore_page.add_element(button_back)
+
+        for i in range(num_highscores):
+
+            text = str(users[i]) + " " + str(scores[i])
+
+            score = Text(text, font)
+
+            dims = score.get_dimensions()
+            pos_x = screen_center_x - ((1/2) * dims[0])
+            pos_y = ((i + 1) * vert_division) - ((1/2) * dims[1])
+            score.set_pos([pos_x, pos_y])
+
+            highscore_page.add_element(score)
+
+            # Save the score to self.highscore_list
+            self.highscore_list.append([str(users[i]), int(scores[i])])
+
+        # Add the page to the MenuManager
+        self.add_page(highscore_page)
+
+    def save_highscore (score, hs_score_file = "highscores.txt"):
+        """
+        Saves a score to the highscores file.
+        """
+
+        index = 0
+
+        for s in self.highscore_list:
+
+            if score < s:
+
+                index += 1
+
+        # Score is not high enough to be added as a highscore
+        if index == len(self.highscore_list):
+
+            return
+
+        else:
+
+            while open(hs_score_file) as f:
+
+                # TODO
+                pass
+
 
     def __display (self):
         """

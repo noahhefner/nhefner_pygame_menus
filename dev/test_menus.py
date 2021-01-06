@@ -72,8 +72,9 @@ dims = game_logo.get_dimensions()
 game_logo.set_pos([SCREEN_CENTER_X - (dims[0] / 2), 20])
 
 start_button = ButtonText("PLAY", font, pos = [10, 300])
-options_button = ButtonText("OPTIONS", font, pos = [10, 350])
-quit_button = ButtonText("QUIT", font, pos = [10, 400])
+highscore_button = ButtonText("HIGHSCORES", font, pos = [10, 350])
+options_button = ButtonText("OPTIONS", font, pos = [10, 400])
+quit_button = ButtonText("QUIT", font, pos = [10, 450])
 
 # Add actions to home elements
 start_button.add_action(man.exit_menu)
@@ -126,6 +127,7 @@ no.add_action(man.navigate, "home")
 home.add_element(game_logo)
 home.add_element(start_button)
 home.add_element(options_button)
+home.add_element(highscore_button)
 home.add_element(quit_button)
 
 options.add_element(back_button)
@@ -140,6 +142,8 @@ options.add_element(selector_yellow)
 confirm_quit.add_element(confirm_text)
 confirm_quit.add_element(yes)
 confirm_quit.add_element(no)
+
+man.add_highscore_page(highscore_button, "home", font)
 
 # Setting the start page
 man.set_start_page("home")
@@ -180,15 +184,19 @@ while True:
                     change_y = snake_block_size
                     change_x = 0
 
-                if event.key == pygame.K_LEFT:
+                elif event.key == pygame.K_LEFT:
 
                     change_x = (-1) * snake_block_size
                     change_y = 0
 
-                if event.key == pygame.K_RIGHT:
+                elif event.key == pygame.K_RIGHT:
 
                     change_x = snake_block_size
                     change_y = 0
+
+                elif event.key == pygame.K_q:
+
+                    game_over = True
 
         # Game logic
         screen.fill(BLACK)

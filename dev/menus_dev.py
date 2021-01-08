@@ -16,6 +16,10 @@ pygame.init()
 BLACK    = [0, 0, 0]
 WHITE    = [255, 255, 255]
 MENU_FPS = 60
+DEFAULT_FONT = pygame.font.SysFont("Arial", 40)
+DEFAULT_TEXT_COLOR = WHITE
+DEFAULT_COLORKEY = BLACK
+DEFAULT_MENU_BACKGROUND_COLOR = BLACK
 
 class Action:
     """
@@ -61,7 +65,7 @@ class ButtonPicture(pygame.sprite.Sprite):
                         clicked.
     """
 
-    def __init__ (self, filename, pos = [0,0], colorkey = BLACK):
+    def __init__ (self, filename, pos = [0,0], colorkey = DEFAULT_COLORKEY):
         """
         Instantiate a ButtonPicture object.
 
@@ -124,7 +128,7 @@ class ButtonPicture(pygame.sprite.Sprite):
         Adds an action to the list of actions for this button.
 
         Positional Arguments:
-            function: The function to execute.
+            function (function reference): The function to execute.
             *args: Arguments for the function.
             **kwargs: Keyword arguments for the function.
         """
@@ -146,7 +150,7 @@ class ButtonPicture(pygame.sprite.Sprite):
         Returns true if the mouse cursor position is on this sprite.
 
         Positional Arguments:
-            mouse_pos (tuple): XY position of the cursor.
+            mouse_pos (list): XY position of the cursor.
         """
 
         # Check x axis
@@ -183,8 +187,9 @@ class ButtonText (pygame.sprite.Sprite):
                         clicked.
     """
 
-    def __init__ (self, text, font, pos = [0,0], color = [255, 255, 255],
-                  background_color = None, antialias = True):
+    def __init__ (self, text, font = DEFAULT_FONT, pos = [0,0],
+                  color = DEFAULT_TEXT_COLOR, background_color = None,
+                  antialias = True):
         """
         Instantiate a ButtonText object.
 
@@ -193,7 +198,7 @@ class ButtonText (pygame.sprite.Sprite):
             font (pygame.font.SysFont): Font to render the text in.
 
         Keyword Arguments:
-            pos (tuple): XY position for the button.
+            pos (list): XY position for the button.
             color (list): Color that the text should be. Should be supplied as a
                           list of three integers between 0 and 255, inclusive.
                           Default is [255, 255, 255], or white.
@@ -326,7 +331,7 @@ class Picture (pygame.sprite.Sprite):
         rect (pygame.image.rect): Position, height, width values for picture.
     """
 
-    def __init__ (self, filename, pos = [0,0], colorkey = BLACK):
+    def __init__ (self, filename, pos = [0,0], colorkey = DEFAULT_COLORKEY):
         """
         Instantiate a Picture object.
 
@@ -382,7 +387,7 @@ class Picture (pygame.sprite.Sprite):
         self.rect.x = pos[0]
         self.rect.y = pos[1]
 
-    def set_picture (self, new_image, new_colorkey = BLACK):
+    def set_picture (self, new_image, new_colorkey = DEFAULT_COLORKEY):
         """
         Set a new picture for this instance of Picture. Preserves x and y
         position of the old picture.
@@ -423,8 +428,9 @@ class Text (pygame.sprite.Sprite):
         rect (pygame.image.rect): Position, height, width values for Text.
     """
 
-    def __init__ (self, text, font, pos = [0,0], color = WHITE, \
-                  antialias = True, background_color = None):
+    def __init__ (self, text, font = DEFAULT_FONT, pos = [0,0],
+                  color = DEFAULT_TEXT_COLOR, antialias = True,
+                  background_color = None):
         """
         Instantiates a new Text object.
 
@@ -488,8 +494,9 @@ class Text (pygame.sprite.Sprite):
         self.rect.x = pos[0]
         self.rect.y = pos[1]
 
-    def set_text (self, new_text, new_font, new_color = WHITE, \
-                  new_antialias = True, new_background_color = None):
+    def set_text (self, new_text, new_font = DEFAULT_FONT,
+                  new_color = DEFAULT_TEXT_COLOR, new_antialias = True,
+                  new_background_color = None):
         """
         Set a new string as the text. Maintains the x and y position of the
         original text.
@@ -530,7 +537,8 @@ class MenuManager:
         start_page_set (Boolean): Switch that checks if start page has been set.
     """
 
-    def __init__ (self, screen, clock, background_color = BLACK):
+    def __init__ (self, screen, clock,
+                  background_color = DEFAULT_MENU_BACKGROUND_COLOR):
         """
         Instantiate a MenuManager object.
 
@@ -720,7 +728,11 @@ class MenuManager:
         # Add the page to the MenuManager
         self.add_page(highscore_page)
 
-    def write_highscore (self, user, score, hs_score_file):
+    def save_highscore (score):
+
+        pass
+
+    def __write_highscore (self, user, score, hs_score_file):
         """
         Saves a score to the highscores file.
 
@@ -768,6 +780,13 @@ class MenuManager:
         contents = "".join(contents)
         f.write(contents)
         f.close()
+
+    def __update_highscore_page (self):
+        """
+        Updates the elements on the highscore page.
+        """
+
+        pass
 
     def __display (self):
         """
@@ -847,7 +866,7 @@ class Page:
         """
         Instantiate a page object.
 
-        Arguments:
+        Positional Arguments:
             id (string/int): ID for this page.
         """
 
@@ -858,17 +877,24 @@ class Page:
         """
         Adds an element to the page.
 
-        Arguments:
+        Positional Arguments:
             new_element (Button): Element to add to the page.
         """
 
         self.elements.append(new_element)
 
+    def clear (self):
+        """
+        Removes all elements from the page.
+        """
+
+        self.elements = list()
+
     def display (self, screen):
         """
         Show this screen in the window.
 
-        Arguments:
+        Positional Arguments:
             screen (pygame.display): Surface to blit the elements to.
         """
 

@@ -19,6 +19,7 @@ save_highscore (score)
       __update_highscore_page, then navigates to the highscore display page
 
     error checking
+        - make sure we have created a highscore page
         - make sure score is >= 0
 
 called by save_highscore

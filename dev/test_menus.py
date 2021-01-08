@@ -109,7 +109,7 @@ selector_yellow.add_action(snake_preview.set_picture, "assets/images/snake_previ
 selector_yellow.add_action(snake.set_color, YELLOW)
 
 # Confirm quit elements
-confirm_text = Text("Are you sure", font)
+confirm_text = Text("Are you sure?")
 dims = confirm_text.get_dimensions()
 confirm_text.set_pos([SCREEN_CENTER_X - (dims[0] / 2), 100])
 yes = ButtonText("Yes", font)

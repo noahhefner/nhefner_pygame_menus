@@ -557,6 +557,7 @@ class MenuManager:
         self.exiting = False
         self.screen_width, self.screen_height = pygame.display.get_surface().get_size()
         self.highscore_list = list()
+        self.num_highscores = 5
 
     def run (self):
         """
@@ -663,6 +664,9 @@ class MenuManager:
               the MenuManager.
         """
 
+        # Save highscore stuff to the MenuManager instance
+        self.num_highscores = num_highscores
+
         # Create the highscore page
         highscore_page = Page("highscores")
 
@@ -673,7 +677,7 @@ class MenuManager:
         users = []
         scores = []
 
-        with open(hs_score_file) as f:
+        with open(hs_score_file, 'r') as f:
 
             contents = f.readlines()
 
@@ -681,20 +685,26 @@ class MenuManager:
 
                 user_score = line.strip().split(" ")
 
+                print(user_score)
+
                 if len(user_score) == 2:
 
                     users.append(user_score[0])
                     scores.append(user_score[1])
 
+                    # Save the score to self.highscore_list
+                    self.highscore_list.append([str(user_score[0]), \
+                                                int(user_score[1])])
+
         screen_center_x = self.screen_width / 2
-        vert_division = self.screen_height / num_highscores + 1
+        vert_division = self.screen_height / (num_highscores + 1)
 
         # Create UI elements and add them to the highscore page
         button_back = ButtonText("Back", font, pos = [10, 10])
         button_back.add_action(self.navigate, back_page_id)
         highscore_page.add_element(button_back)
 
-        for i in range(num_highscores):
+        for i in range(len(self.highscore_list)):
 
             text = str(users[i]) + " " + str(scores[i])
 
@@ -707,37 +717,57 @@ class MenuManager:
 
             highscore_page.add_element(score)
 
-            # Save the score to self.highscore_list
-            self.highscore_list.append([str(users[i]), int(scores[i])])
-
         # Add the page to the MenuManager
         self.add_page(highscore_page)
 
-    def save_highscore (score, hs_score_file = "highscores.txt"):
+    def write_highscore (self, user, score, hs_score_file):
         """
         Saves a score to the highscores file.
+
+        Positional Arguments:
+            user (string): Username of the player.
+            score (int): Score the player got.
+            hs_score_file (string): Path to the file where highscores are saved.
         """
 
+        # Read contents from file
+        f = open(hs_score_file, 'r')
+        contents = f.readlines()
+        f.close()
+
+        # Find the index of where this score goes
         index = 0
 
-        for s in self.highscore_list:
+        for line in contents:
 
-            if score < s:
+            user_score = line.strip().split(" ")
 
-                index += 1
+            if len(user_score) == 2:
 
-        # Score is not high enough to be added as a highscore
-        if index == len(self.highscore_list):
+                f_user = user_score[0]
+                f_score = int(user_score[1])
 
-            return
+                if score < f_score:
 
-        else:
+                    index += 1
 
-            while open(hs_score_file) as f:
+        # Add the score to whatever index it should be at
+        contents.insert(index, f"{user} {score}\n")
 
-                # TODO
-                pass
+        # Add the score to the highscore list in the MenuManager
+        self.highscore_list.insert(index, [user, score])
 
+        # Make sure we don't exceed the maximum number of scores we are allowed
+        # to save
+        if len(contents) > self.num_highscores:
+
+            contents = contents[0:self.num_highscores]
+
+        # Write the new contents to the highscore file
+        f = open(hs_score_file, 'w')
+        contents = "".join(contents)
+        f.write(contents)
+        f.close()
 
     def __display (self):
         """

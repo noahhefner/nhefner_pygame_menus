@@ -222,4 +222,6 @@ while True:
 
         clock.tick(20)
 
+    man.write_highscore("fatchungus", 25, "highscores.txt")
+
 pygame.quit()

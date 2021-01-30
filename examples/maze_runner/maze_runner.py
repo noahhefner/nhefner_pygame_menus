@@ -101,7 +101,7 @@ class Player(pygame.sprite.Sprite):
 
         # Set height, width
         self.image = pygame.Surface([15, 15])
-        self.image.fill(WHITE)
+        self.image.fill(BLUE)
 
         # Make our top-left corner the passed-in location.
         self.rect = self.image.get_rect()
@@ -292,12 +292,17 @@ def main():
     button_quit.add_action(man.navigate, "confirm_exit")
 
     button_back_op = ButtonText("BACK", font, pos = [10, 10], background_color = [255, 0, 0])
-    button_blue_player = ButtonText("BLUE", font, pos = [10, 50])
-    button_red_player = ButtonText("RED", font, pos = [10, 90])
+
+    text_player_color = Text("CHOSSE YOUR PLAYER COLOR", font, pos = [10, 100])
+    button_blue_player = ButtonText("BLUE", font, pos = [10, 150])
+    button_red_player = ButtonText("RED", font, pos = [10, 200])
+    picture_arrow = Picture("arrow.png", pos = [120, 120])
 
     button_back_op.add_action(man.navigate, "home")
     button_blue_player.add_action(player.set_color, BLUE)
+    button_blue_player.add_action(picture_arrow.set_pos, [120, 120])
     button_red_player.add_action(player.set_color, RED)
+    button_red_player.add_action(picture_arrow.set_pos, [120, 170])
     # Notice we can use the set_color method on the Player class to change the
     # color of the player when the user presses this button.
 
@@ -314,8 +319,10 @@ def main():
     home.add_element(button_quit)
 
     options.add_element(button_back_op)
+    options.add_element(text_player_color)
     options.add_element(button_blue_player)
     options.add_element(button_red_player)
+    options.add_element(picture_arrow)
 
     confirm_exit.add_element(text_confirmation)
     confirm_exit.add_element(button_yes)
@@ -357,6 +364,8 @@ def main():
                         player.changespeed(0, -5)
                     if event.key == pygame.K_DOWN:
                         player.changespeed(0, 5)
+                    if event.key == pygame.K_q:
+                        in_game = False
 
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT:

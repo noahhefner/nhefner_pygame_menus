@@ -30,6 +30,8 @@ if __name__ == "__main__":
     main()
     pygame.quit()
 
+---------------------------- CREDITS FOR THIS GAME -----------------------------
+
 Sample Python/Pygame Programs
 Simpson College Computer Science
 http://programarcadegames.com/
@@ -48,6 +50,8 @@ http://programarcadegames.com/python_examples/f.php?file=platform_scroller.py
 http://programarcadegames.com/python_examples/f.php?file=platform_moving.py
 http://programarcadegames.com/python_examples/sprite_sheets/
 
+--------------------------------------------------------------------------------
+
 """
 import pygame
 
@@ -61,13 +65,6 @@ BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 PURPLE = (255, 0, 255)
-
-game_settings = {
-
-    "player_color" : WHITE
-
-}
-
 
 class Wall(pygame.sprite.Sprite):
     """This class represents the bar at the bottom that the player controls """
@@ -277,7 +274,7 @@ def main():
     confirm_exit = Page("confirm_exit")
 
     # Step Three: Create elements for the pages
-    font = pygame.font.SysFont("Ubuntu-B", 40) # Font for text buttons
+    font = pygame.font.Font("arcade_font.ttf", 40) # Font for text buttons
 
     button_play = ButtonText("PLAY", font, pos = [20, 375], background_color = [255, 0, 0])
     button_options = ButtonText("OPTIONS", font, pos = [20, 400], background_color = [255, 0, 0])
@@ -426,4 +423,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    pygame.quit() # Moved pygame.quit() here
+    pygame.quit()

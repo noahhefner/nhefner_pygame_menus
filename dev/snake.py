@@ -13,9 +13,13 @@ class Snake:
 
     def __init__ (self, starting_pos = [0, 0], color = GREEN, block_size = 20):
 
-        self.blocks = [[0, 0]]
+        self.blocks = [starting_pos]
         self.color = color
         self.block_size = block_size
+
+    def get_length (self):
+
+        return len(self.blocks)
 
     def set_color (self, new_color):
 

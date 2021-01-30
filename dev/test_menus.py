@@ -22,8 +22,8 @@ from menus_dev import MenuManager, Page, ButtonText, ButtonPicture, Picture, Tex
 # Constants
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
-SCREEN_CENTER_X = SCREEN_WIDTH / 2
-SCREEN_CENTER_Y = SCREEN_HEIGHT / 2
+SCREEN_CENTER_X = int(SCREEN_WIDTH / 2)
+SCREEN_CENTER_Y = int(SCREEN_HEIGHT / 2)
 BLUE = [0, 0, 255]
 GREEN = [0, 255, 0]
 WHITE = [255, 255, 255]
@@ -193,6 +193,15 @@ while True:
         # Game logic
         screen.fill(BLACK)
         snake_head = snake.get_head()
+
+        # End the game if the snake bites itself or goes off screen
+        if (snake.collides_with(snake_head) and snake.get_length() > 1) or \
+           snake_head[0] < 0 or snake_head[0] > SCREEN_WIDTH or \
+           snake_head[1] < 0 or snake_head[1] > SCREEN_HEIGHT:
+
+            game_over = True
+
+        # Move the snake and the apple (if the snake gets it)
         new_block = [snake_head[0] + change_x, snake_head[1] + change_y]
         snake.add_block(new_block)
 

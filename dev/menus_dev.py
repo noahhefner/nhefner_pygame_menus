@@ -7,6 +7,7 @@ Last Edit: 1 January 2021
 # Imports
 import pygame
 import string
+import os.path
 
 # Initialize pygame
 pygame.init()
@@ -15,6 +16,10 @@ pygame.init()
 BLACK    = [0, 0, 0]
 WHITE    = [255, 255, 255]
 MENU_FPS = 60
+DEFAULT_FONT = pygame.font.SysFont("Arial", 40)
+DEFAULT_TEXT_COLOR = WHITE
+DEFAULT_COLORKEY = BLACK
+DEFAULT_MENU_BACKGROUND_COLOR = BLACK
 
 class Action:
     """
@@ -60,7 +65,7 @@ class ButtonPicture(pygame.sprite.Sprite):
                         clicked.
     """
 
-    def __init__ (self, filename, pos = [0,0], colorkey = BLACK):
+    def __init__ (self, filename, pos = [0,0], colorkey = DEFAULT_COLORKEY):
         """
         Instantiate a ButtonPicture object.
 
@@ -123,7 +128,7 @@ class ButtonPicture(pygame.sprite.Sprite):
         Adds an action to the list of actions for this button.
 
         Positional Arguments:
-            function: The function to execute.
+            function (function reference): The function to execute.
             *args: Arguments for the function.
             **kwargs: Keyword arguments for the function.
         """
@@ -145,7 +150,7 @@ class ButtonPicture(pygame.sprite.Sprite):
         Returns true if the mouse cursor position is on this sprite.
 
         Positional Arguments:
-            mouse_pos (tuple): XY position of the cursor.
+            mouse_pos (list): XY position of the cursor.
         """
 
         # Check x axis
@@ -182,8 +187,9 @@ class ButtonText (pygame.sprite.Sprite):
                         clicked.
     """
 
-    def __init__ (self, text, font, pos = [0,0], color = [255, 255, 255],
-                  background_color = None, antialias = True):
+    def __init__ (self, text, font = DEFAULT_FONT, pos = [0,0],
+                  color = DEFAULT_TEXT_COLOR, background_color = None,
+                  antialias = True):
         """
         Instantiate a ButtonText object.
 
@@ -192,7 +198,7 @@ class ButtonText (pygame.sprite.Sprite):
             font (pygame.font.SysFont): Font to render the text in.
 
         Keyword Arguments:
-            pos (tuple): XY position for the button.
+            pos (list): XY position for the button.
             color (list): Color that the text should be. Should be supplied as a
                           list of three integers between 0 and 255, inclusive.
                           Default is [255, 255, 255], or white.
@@ -325,7 +331,7 @@ class Picture (pygame.sprite.Sprite):
         rect (pygame.image.rect): Position, height, width values for picture.
     """
 
-    def __init__ (self, filename, pos = [0,0], colorkey = BLACK):
+    def __init__ (self, filename, pos = [0,0], colorkey = DEFAULT_COLORKEY):
         """
         Instantiate a Picture object.
 
@@ -381,7 +387,7 @@ class Picture (pygame.sprite.Sprite):
         self.rect.x = pos[0]
         self.rect.y = pos[1]
 
-    def set_picture (self, new_image, new_colorkey = BLACK):
+    def set_picture (self, new_image, new_colorkey = DEFAULT_COLORKEY):
         """
         Set a new picture for this instance of Picture. Preserves x and y
         position of the old picture.
@@ -422,8 +428,9 @@ class Text (pygame.sprite.Sprite):
         rect (pygame.image.rect): Position, height, width values for Text.
     """
 
-    def __init__ (self, text, font, pos = [0,0], color = WHITE, \
-                  antialias = True, background_color = None):
+    def __init__ (self, text, font = DEFAULT_FONT, pos = [0,0],
+                  color = DEFAULT_TEXT_COLOR, antialias = True,
+                  background_color = None):
         """
         Instantiates a new Text object.
 
@@ -487,8 +494,9 @@ class Text (pygame.sprite.Sprite):
         self.rect.x = pos[0]
         self.rect.y = pos[1]
 
-    def set_text (self, new_text, new_font, new_color = WHITE, \
-                  new_antialias = True, new_background_color = None):
+    def set_text (self, new_text, new_font = DEFAULT_FONT,
+                  new_color = DEFAULT_TEXT_COLOR, new_antialias = True,
+                  new_background_color = None):
         """
         Set a new string as the text. Maintains the x and y position of the
         original text.
@@ -529,7 +537,8 @@ class MenuManager:
         start_page_set (Boolean): Switch that checks if start page has been set.
     """
 
-    def __init__ (self, screen, clock, background_color = BLACK):
+    def __init__ (self, screen, clock,
+                  background_color = DEFAULT_MENU_BACKGROUND_COLOR):
         """
         Instantiate a MenuManager object.
 
@@ -554,6 +563,9 @@ class MenuManager:
         self.current_page = None
         self.start_page = None
         self.exiting = False
+        self.screen_width, self.screen_height = pygame.display.get_surface().get_size()
+        self.highscore_list = list()
+        self.num_highscores = 5
 
     def run (self):
         """
@@ -631,6 +643,150 @@ class MenuManager:
         """
 
         exit()
+
+    def add_highscore_page (self, button, back_page_id, font,
+                            num_highscores = 5,
+                            hs_score_file = "highscores.txt"):
+        """
+        Adds a highscore page to the MenuManager.
+
+        Positional Arguments:
+            button (ButtonText, ButtonPicture): The button you want to use to
+                                                navigate to the highscore page.
+            back_page_id (Page): The highscore page has a back button.
+                                 "back_page_id" should be the ID of the page you
+                                 want to return to when the back button is
+                                 pressed.
+            font (pygame.font.Font/Sysfont): Font used to render the Text
+                                             objects on the highscore page.
+
+        Keyword Arguments:
+            hs_score_file (string): Path to the file where highscores are saved.
+                                    Default is in cwd with filename
+                                    "highscores.txt".
+
+        Prerequisites:
+            - The button passed as the "button" argument should be of type
+              ButtonText or ButtonPicture.
+            - The page with ID back_page_id should be a page that is already in
+              the MenuManager.
+        """
+
+        # Save highscore stuff to the MenuManager instance
+        self.num_highscores = num_highscores
+
+        # Create the highscore page
+        highscore_page = Page("highscores")
+
+        # Add navigation action to the button
+        button.add_action(self.navigate, "highscores")
+
+        # Fetch the highscores and usernames from the highscores.txt file
+        users = []
+        scores = []
+
+        with open(hs_score_file, 'r') as f:
+
+            contents = f.readlines()
+
+            for line in contents:
+
+                user_score = line.strip().split(" ")
+
+                print(user_score)
+
+                if len(user_score) == 2:
+
+                    users.append(user_score[0])
+                    scores.append(user_score[1])
+
+                    # Save the score to self.highscore_list
+                    self.highscore_list.append([str(user_score[0]), \
+                                                int(user_score[1])])
+
+        screen_center_x = self.screen_width / 2
+        vert_division = self.screen_height / (num_highscores + 1)
+
+        # Create UI elements and add them to the highscore page
+        button_back = ButtonText("Back", font, pos = [10, 10])
+        button_back.add_action(self.navigate, back_page_id)
+        highscore_page.add_element(button_back)
+
+        for i in range(len(self.highscore_list)):
+
+            text = str(users[i]) + " " + str(scores[i])
+
+            score = Text(text, font)
+
+            dims = score.get_dimensions()
+            pos_x = screen_center_x - ((1/2) * dims[0])
+            pos_y = ((i + 1) * vert_division) - ((1/2) * dims[1])
+            score.set_pos([pos_x, pos_y])
+
+            highscore_page.add_element(score)
+
+        # Add the page to the MenuManager
+        self.add_page(highscore_page)
+
+    def save_highscore (score):
+
+        pass
+
+    def __write_highscore (self, user, score, hs_score_file):
+        """
+        Saves a score to the highscores file.
+
+        Positional Arguments:
+            user (string): Username of the player.
+            score (int): Score the player got.
+            hs_score_file (string): Path to the file where highscores are saved.
+        """
+
+        # Read contents from file
+        f = open(hs_score_file, 'r')
+        contents = f.readlines()
+        f.close()
+
+        # Find the index of where this score goes
+        index = 0
+
+        for line in contents:
+
+            user_score = line.strip().split(" ")
+
+            if len(user_score) == 2:
+
+                f_user = user_score[0]
+                f_score = int(user_score[1])
+
+                if score < f_score:
+
+                    index += 1
+
+        # Add the score to whatever index it should be at
+        contents.insert(index, f"{user} {score}\n")
+
+        # Add the score to the highscore list in the MenuManager
+        self.highscore_list.insert(index, [user, score])
+
+        # Make sure we don't exceed the maximum number of scores we are allowed
+        # to save
+        if len(contents) > self.num_highscores:
+
+            contents = contents[0:self.num_highscores]
+
+        # Write the new contents to the highscore file
+        f = open(hs_score_file, 'w')
+        contents = "".join(contents)
+        f.write(contents)
+        f.close()
+
+    def __update_highscore_page (self):
+        """
+        Updates the elements on the highscore page.
+        """
+
+        pass
 
     def __display (self):
         """
@@ -710,7 +866,7 @@ class Page:
         """
         Instantiate a page object.
 
-        Arguments:
+        Positional Arguments:
             id (string/int): ID for this page.
         """
 
@@ -721,17 +877,24 @@ class Page:
         """
         Adds an element to the page.
 
-        Arguments:
+        Positional Arguments:
             new_element (Button): Element to add to the page.
         """
 
         self.elements.append(new_element)
 
+    def clear (self):
+        """
+        Removes all elements from the page.
+        """
+
+        self.elements = list()
+
     def display (self, screen):
         """
         Show this screen in the window.
 
-        Arguments:
+        Positional Arguments:
             screen (pygame.display): Surface to blit the elements to.
         """
 

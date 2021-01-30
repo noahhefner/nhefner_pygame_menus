@@ -1,47 +1,30 @@
-Action
-    init
-    execute
-ButtonPicture
-    init
-    get_dimensions
-    get_pos
-    set_pos
-    add_action
-    execute_actions
-    is_clicked
-ButtonText
-    init
-    get_dimensions
-    get_pos
-    get_text
-    set_pos
-    set_text
-    add_action
-    execute_actions
-    is_clicked
-Picture
-    init
-    get_dimensions
-    get_pos
-    set_pos
-    set_image
-Text
-    init
-    get_dimensions
-    get_pos
-    set_pos
-    set_text
-MenuManager
-    init
-    run
-    add_page
-    set_start_page
-    navigate
-    exit_menu
-    kill_program
-    __display
-    __update
-Page
-    init
-    add_element
-    display
+
+called menu manager creation
+add_highscore_page (button, back_page_id, font, num_highscores = 5,
+                    hs_score_file = "highscores.txt")
+    - sets up highscore display page
+    - sets up username input page
+    - save num_highscores and hs_score_file to fields in MenuManager
+
+    error checking
+        - make sure button is an element of some page
+        - make sure some page in the menumaneger has page id back_page_id
+        - make sure num_highscores >= 0
+        - make sure hs_score_file exists
+
+called after game end
+save_highscore (score)
+    - Navigate to username input page
+    - on this page, have a button that calls __write_highscore, then
+      __update_highscore_page, then navigates to the highscore display page
+
+    error checking
+        - make sure we have created a highscore page
+        - make sure score is >= 0
+
+called by save_highscore
+__write_highscore (user, score, file)
+    - writes the username and score to the file
+    - handles figuring out where the score goes and writing to the text file
+__update_highscore_page ()
+    - updates the positions of the elements on the highscore page

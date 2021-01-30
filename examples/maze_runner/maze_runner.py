@@ -24,7 +24,7 @@ def main:
 
             game drawing here
 
-        game reset code here (notice this is NOT in that game in progress loop)
+        game reset code here
 
 if __name__ == "__main__":
     main()
@@ -265,15 +265,15 @@ def main():
 
     """ Menu Manager Additions --------------------------------------------- """
 
-    # Step One: Create menu manager
+    # Step One: Create menu manager --------------------------------------------
     man = MenuManager(screen, clock)
 
-    # Step Two: Create pages
+    # Step Two: Create pages ---------------------------------------------------
     home = Page("home")
     options = Page("options")
     confirm_exit = Page("confirm_exit")
 
-    # Step Three: Create elements for the pages
+    # Step Three: Create elements for the pages --------------------------------
     font = pygame.font.Font("arcade_font.ttf", 40) # Font for text buttons
 
     button_play = ButtonText("PLAY", font, pos = [20, 375], background_color = [255, 0, 0])
@@ -290,7 +290,6 @@ def main():
                                                        # our options page as an argument to the
                                                        # add_action method.
     button_quit.add_action(man.navigate, "confirm_exit")
-
 
     button_back_op = ButtonText("BACK", font, pos = [10, 10], background_color = [255, 0, 0])
     button_blue_player = ButtonText("BLUE", font, pos = [10, 50])
@@ -309,7 +308,7 @@ def main():
     button_yes.add_action(man.kill_program)
     button_no.add_action(man.navigate, "home")
 
-    # Step Four: Add elements to their pages
+    # Step Four: Add elements to their pages -----------------------------------
     home.add_element(button_play)
     home.add_element(button_options)
     home.add_element(button_quit)
@@ -322,16 +321,16 @@ def main():
     confirm_exit.add_element(button_yes)
     confirm_exit.add_element(button_no)
 
-    # Step Five: Add pages to menu manager
+    # Step Five: Add pages to menu manager -------------------------------------
     man.add_page(home)
     man.add_page(options)
     man.add_page(confirm_exit)
 
-    # Step Six: Set a start page
+    # Step Six: Set a start page -----------------------------------------------
     man.set_start_page("home")
 
     """
-    NOTICE: Put everything in an infinite loop. WHat will happen is that after
+    NOTICE: Put everything in an infinite loop. What will happen is that after
     we exit the menu, we will enter the game.
     """
     while True:

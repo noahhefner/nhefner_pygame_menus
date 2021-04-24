@@ -20,6 +20,7 @@ DEFAULT_FONT = pygame.font.SysFont("Arial", 40)
 DEFAULT_TEXT_COLOR = WHITE
 DEFAULT_COLORKEY = BLACK
 DEFAULT_MENU_BACKGROUND_COLOR = BLACK
+HIGHSCORE_FILE = "highscores.txt"
 
 class Action:
     """
@@ -494,6 +495,16 @@ class Text (pygame.sprite.Sprite):
         self.rect.x = pos[0]
         self.rect.y = pos[1]
 
+    def get_text (self):
+        """
+        Get the text as a String.
+
+        Returns:
+            text (String): The text that makes the image.
+        """
+
+        return self.text
+
     def set_text (self, new_text, new_font = DEFAULT_FONT,
                   new_color = DEFAULT_TEXT_COLOR, new_antialias = True,
                   new_background_color = None):
@@ -537,8 +548,7 @@ class MenuManager:
         start_page_set (Boolean): Switch that checks if start page has been set.
     """
 
-    def __init__ (self, screen, clock,
-                  background_color = DEFAULT_MENU_BACKGROUND_COLOR):
+    def __init__ (self, screen, clock):
         """
         Instantiate a MenuManager object.
 
@@ -558,7 +568,7 @@ class MenuManager:
 
         self.screen = screen
         self.clock = clock
-        self.background_color = background_color
+        self.background_color = DEFAULT_MENU_BACKGROUND_COLOR
         self.pages = list()
         self.current_page = None
         self.start_page = None
@@ -609,6 +619,28 @@ class MenuManager:
         print("Invalid start page id!")
         exit(-1)
 
+    def set_background_color (self, color):
+        """
+        Sets the background color for the menu pages.
+
+        Positional Arguments:
+            color (List): Background color for menu pages. List of 3 integers
+                          ranging from 0 to 255 inclusive.
+        """
+
+        # Type check
+        if not (type(color) is list):
+
+            print("Error in set_background_color: Background color is not list!")
+            exit(-1)
+
+        if (len(color) != 3):
+
+            print("Error in set_backgro")
+            exit(-1)
+
+        self.background_color = color
+
     def navigate (self, page_id):
         """
         Sets the currently showing page using the id attribute of Page class.
@@ -645,8 +677,7 @@ class MenuManager:
         exit()
 
     def add_highscore_page (self, button, back_page_id, font,
-                            num_highscores = 5,
-                            hs_score_file = "highscores.txt"):
+                            num_highscores = 5):
         """
         Adds a highscore page to the MenuManager.
 
@@ -659,11 +690,6 @@ class MenuManager:
                                  pressed.
             font (pygame.font.Font/Sysfont): Font used to render the Text
                                              objects on the highscore page.
-
-        Keyword Arguments:
-            hs_score_file (string): Path to the file where highscores are saved.
-                                    Default is in cwd with filename
-                                    "highscores.txt".
 
         Prerequisites:
             - The button passed as the "button" argument should be of type
@@ -681,11 +707,83 @@ class MenuManager:
         # Add navigation action to the button
         button.add_action(self.navigate, "highscores")
 
+        # Read in scores and usernames and create corresponding UI elements
+        self.__import_highscores()
+
+        # Add the page to the MenuManager
+        self.add_page(highscore_page)
+
+    def save_highscore (self, user, score):
+        """
+        Saves a score to the highscores file.
+
+        Positional Arguments:
+            user (string): Username of the player.
+            score (int): Score the player got.
+            hs_score_file (string): Path to the file where highscores are saved.
+        """
+
+        # Read contents from file
+        f = open(HIGHSCORE_FILE, 'r')
+        contents = f.readlines()
+        f.close()
+
+        # Find the index of where this score goes
+        index = 0
+
+        for line in contents:
+
+            user_score = line.strip().split(" ")
+
+            if len(user_score) == 2:
+
+                f_user = user_score[0]
+                f_score = int(user_score[1])
+
+                if score < f_score:
+
+                    index += 1
+
+        # Add the score to whatever index it should be at
+        contents.insert(index, f"{user} {score}\n")
+
+        # Add the score to the highscore list in the MenuManager
+        self.highscore_list.insert(index, [user, score])
+
+        # Make sure we don't exceed the maximum number of scores we are allowed
+        # to save
+        if len(contents) > self.num_highscores:
+
+            contents = contents[0:self.num_highscores]
+
+        # Write the new contents to the highscore file
+        f = open(HIGHSCORE_FILE, 'w')
+        contents = "".join(contents)
+        f.write(contents)
+        f.close()
+
+        self.__import_highscores()
+
+    def __import_highscores (self):
+        """
+        Read in highscores from the highscore file and create the UI elements
+        for those usernames and highscores.
+        """
+
+        highscore_page = None
+
+        for page in self.pages:
+
+            if page.get_id() == "highscores":
+
+                highscore_page = page
+                highscore_page.clear()
+
         # Fetch the highscores and usernames from the highscores.txt file
         users = []
         scores = []
 
-        with open(hs_score_file, 'r') as f:
+        with open(HIGHSCORE_FILE, 'r') as f:
 
             contents = f.readlines()
 
@@ -724,69 +822,6 @@ class MenuManager:
             score.set_pos([pos_x, pos_y])
 
             highscore_page.add_element(score)
-
-        # Add the page to the MenuManager
-        self.add_page(highscore_page)
-
-    def save_highscore (score):
-
-        pass
-
-    def __write_highscore (self, user, score, hs_score_file):
-        """
-        Saves a score to the highscores file.
-
-        Positional Arguments:
-            user (string): Username of the player.
-            score (int): Score the player got.
-            hs_score_file (string): Path to the file where highscores are saved.
-        """
-
-        # Read contents from file
-        f = open(hs_score_file, 'r')
-        contents = f.readlines()
-        f.close()
-
-        # Find the index of where this score goes
-        index = 0
-
-        for line in contents:
-
-            user_score = line.strip().split(" ")
-
-            if len(user_score) == 2:
-
-                f_user = user_score[0]
-                f_score = int(user_score[1])
-
-                if score < f_score:
-
-                    index += 1
-
-        # Add the score to whatever index it should be at
-        contents.insert(index, f"{user} {score}\n")
-
-        # Add the score to the highscore list in the MenuManager
-        self.highscore_list.insert(index, [user, score])
-
-        # Make sure we don't exceed the maximum number of scores we are allowed
-        # to save
-        if len(contents) > self.num_highscores:
-
-            contents = contents[0:self.num_highscores]
-
-        # Write the new contents to the highscore file
-        f = open(hs_score_file, 'w')
-        contents = "".join(contents)
-        f.write(contents)
-        f.close()
-
-    def __update_highscore_page (self):
-        """
-        Updates the elements on the highscore page.
-        """
-
-        pass
 
     def __display (self):
         """
@@ -872,6 +907,26 @@ class Page:
 
         self.id = id
         self.elements = list()
+
+    def get_id (self):
+        """
+        Get the ID of the Page.
+
+        Returns:
+            id (Int/String): ID of the Page.
+        """
+
+        return self.id
+
+    def get_elements (self):
+        """
+        Get the elements in the Page.
+
+        Returns:
+            elements (list): List of elements in the Page.
+        """
+
+        return self.elements
 
     def add_element (self, new_element):
         """

@@ -51,7 +51,8 @@ snake = Snake(starting_pos = [SCREEN_CENTER_X, SCREEN_CENTER_Y],
 """ Menu Stuff ------------------------------------------------------------- """
 
 # Create the menu manager
-man = MenuManager(screen, clock, background_color = BLACK)
+man = MenuManager(screen, clock)
+man.set_background_color(RED)
 
 # Font that we use for text buttons
 font = pygame.font.Font("assets/fonts/ARCADECLASSIC.TTF", 50)
@@ -231,6 +232,6 @@ while True:
 
         clock.tick(20)
 
-    man.write_highscore("fatchungus", 25, "highscores.txt")
+    man.save_highscore("fatchungus", 100)
 
 pygame.quit()
